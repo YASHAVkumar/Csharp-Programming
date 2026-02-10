@@ -509,6 +509,9 @@ using(StreamReader reader = new(SharedData.FilePath))
     List<Thread> processingThreads = new();
     int ThreadCount = 0;
 
+    // Create semaphore to limit the number of concurrent threads
+    SemaphoreSlim semaphore = new(SharedData.MaxConcurrentThread, SharedData.MaxConcurrentThread);
+
     while ((line = reader.ReadLine()) != null)
     {
         if(string.IsNullOrWhiteSpace(line))
@@ -524,40 +527,73 @@ using(StreamReader reader = new(SharedData.FilePath))
         {
             List<string> chunkToProcess = new(chunk); // Create a copy of the chunk for processing
             string chunkName = $"Chunk {ThreadCount + 1}"; // Name for the chunk being processed
-            
-            Thread processingThread = new(() =>
+            ThreadPool.QueueUserWorkItem((object? state) =>
+            //Thread processingThread = new(() =>
             {
-                InvokeDataProcessing(chunkToProcess, chunkName);
-            });
+                // Wait for the semaphore to allow processing
+                semaphore.Wait();
+                try
+                {
+                    InvokeDataProcessingWithMutex(chunkToProcess, state?.ToString()??"Unknown Chunk");
+                }
+                catch(Exception ex)
+                {
+                    Console.WriteLine($"Error processing {chunkName}: {ex.Message}");
+                }
+                finally
+                {
+                    semaphore.Release(); // Release the semaphore when processing is complete
+                }
+            
+            },chunkName);
+
             ThreadCount++;
-            processingThread.Name = $"Processing Thread {ThreadCount}";
-            processingThreads.Add(processingThread);
-            processingThread.Start();
+
+            // processingThread.Name = $"Processing Thread {ThreadCount}";
+            // processingThreads.Add(processingThread);
+            // processingThread.Start();
+            
             chunk.Clear(); // Clear the chunk for the next set of lines
          }
     }
 
     //process any remaining lines in the last chunk
     if(chunk.Count > 0)
-    {
-        string chunkName = $"Chunk {ThreadCount + 1}"; // Name for the last chunk being processed
+    {  
+        ThreadCount++;
+        string chunkName = $"Chunk {ThreadCount}"; // Name for the last chunk being processed
         Thread processingThread = new(() =>
-        {
-            InvokeDataProcessing(chunk, chunkName);
+        { // Wait for the semaphore to allow processing
+                semaphore.Wait();
+                try
+                {
+                InvokeDataProcessing(chunk, chunkName);
+                }
+                catch(Exception ex)
+                {
+                    Console.WriteLine($"Error processing {chunkName}: {ex.Message}");
+                }
+                finally
+                {
+                    semaphore.Release(); // Release the semaphore when processing is complete
+                }
         });
         processingThread.Name = $"Processing Thread {ThreadCount + 1}";
         processingThreads.Add(processingThread);
         processingThread.Start();
     }
-    
 
-    foreach(var thread in processingThreads)
+    SharedData.countdownEvent = new CountdownEvent(ThreadCount - 1); // Initialize CountdownEvent with the number of processing threads //10
+                                                                     //initialize CountdownEvent with the number of processing threads                                                                   //current count of processing threads is ThreadCount-1 because the last chunk is being processed in the main thread and not added to the processingThreads list
+    SharedData.countdownEvent.Wait(); // Wait for all processing threads to complete
+
+    foreach (var thread in processingThreads)
     {
         thread.Join();
     }
 }
 
-
+Console.WriteLine("All chunks have been processed. from csv file");
 Console.WriteLine("Press Enter to exit...");
 Console.ReadLine();
 
@@ -581,6 +617,42 @@ static void InvokeDataProcessing(List<string> chunk, string chunkName)
    }  
 }
 
+static void InvokeDataProcessingWithMutex(List<string> chunk, string chunkName)
+{
+   
+    Console.WriteLine($"{chunkName} is being processing by {Thread.CurrentThread.Name}...");
+   CSVWithThreading csvProcessor = new() { ChunkName = chunkName, Data = chunk };
+   csvProcessor.DataProcessing();
+
+    // Display
+    try{
+    SharedData.mutex.WaitOne(); // Acquire the mutex before accessing shared resources 
+    {
+        Console.WriteLine("-----------------------------------");
+        Console.WriteLine($"{chunkName} processed of size {chunk.Count} by {Thread.CurrentThread.Name}");
+
+        foreach (var kvp in csvProcessor.GenderCount)
+        {
+            Console.WriteLine($"{chunkName} - {kvp.Key}: {kvp.Value}");
+        }
+
+    }
+    }
+    catch(Exception ex)
+    {
+        Console.WriteLine($"Error in {chunkName} while acquiring mutex: {ex.Message}");
+    }
+    finally
+    {
+       if(SharedData.countdownEvent.CurrentCount > 0)
+        SharedData.countdownEvent.Signal(); // Signal that this thread has completed processing
+       else 
+         SharedData.countdownEvent.Reset(); // Reset the CountdownEvent if the count has already reached zero to avoid exceptions in case of extra signals
+         
+           //decrement the count of the CountdownEvent to indicate that this thread has completed processing
+        SharedData.mutex.ReleaseMutex(); // Release the mutex after accessing shared resources
+    }
+}
 
 
 // static IEnumerator<int> AsEnumerator(List<int> list)

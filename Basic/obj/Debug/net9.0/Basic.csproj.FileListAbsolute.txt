@@ -12,3 +12,4 @@ d:\Development Enviroment\Genrics\Second\Basic\obj\Debug\net9.0\refint\Basic.dll
 d:\Development Enviroment\Genrics\Second\Basic\obj\Debug\net9.0\Basic.pdb
 d:\Development Enviroment\Genrics\Second\Basic\obj\Debug\net9.0\Basic.genruntimeconfig.cache
 d:\Development Enviroment\Genrics\Second\Basic\obj\Debug\net9.0\ref\Basic.dll
+D:\Development Enviroment\Genrics\Second\Basic\obj\Debug\net9.0\Basic.sourcelink.json

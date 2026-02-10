@@ -4,6 +4,10 @@ public class SharedData
     public static object lockObject = new();
     public static string FilePath = "data.csv";
     public static int chunkSize = 100; // Number of lines to read/write at a time
+    public static int MaxConcurrentThread = 3; // Maximum number of concurrent threads
+    public static Mutex mutex = new(); // Mutex to control access to shared resources no longer need of lockObject
+
+    public static CountdownEvent countdownEvent; // CountdownEvent to wait for all threads to complete
 }
 
 
