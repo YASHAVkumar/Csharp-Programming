@@ -1,0 +1,14 @@
+d:\Development Enviroment\Genrics\Second\Basic\bin\Debug\net9.0\Basic.exe
+d:\Development Enviroment\Genrics\Second\Basic\bin\Debug\net9.0\Basic.deps.json
+d:\Development Enviroment\Genrics\Second\Basic\bin\Debug\net9.0\Basic.runtimeconfig.json
+d:\Development Enviroment\Genrics\Second\Basic\bin\Debug\net9.0\Basic.dll
+d:\Development Enviroment\Genrics\Second\Basic\bin\Debug\net9.0\Basic.pdb
+d:\Development Enviroment\Genrics\Second\Basic\obj\Debug\net9.0\Basic.GeneratedMSBuildEditorConfig.editorconfig
+d:\Development Enviroment\Genrics\Second\Basic\obj\Debug\net9.0\Basic.AssemblyInfoInputs.cache
+d:\Development Enviroment\Genrics\Second\Basic\obj\Debug\net9.0\Basic.AssemblyInfo.cs
+d:\Development Enviroment\Genrics\Second\Basic\obj\Debug\net9.0\Basic.csproj.CoreCompileInputs.cache
+d:\Development Enviroment\Genrics\Second\Basic\obj\Debug\net9.0\Basic.dll
+d:\Development Enviroment\Genrics\Second\Basic\obj\Debug\net9.0\refint\Basic.dll
+d:\Development Enviroment\Genrics\Second\Basic\obj\Debug\net9.0\Basic.pdb
+d:\Development Enviroment\Genrics\Second\Basic\obj\Debug\net9.0\Basic.genruntimeconfig.cache
+d:\Development Enviroment\Genrics\Second\Basic\obj\Debug\net9.0\ref\Basic.dll
