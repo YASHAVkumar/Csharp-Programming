@@ -15,6 +15,9 @@ public partial class Student
         Name = newName;
         OnNameChanged();
     }
+   
 
+   public partial string ParentName{get; set;}
+   public partial string this[int index] { get;}
     
 }

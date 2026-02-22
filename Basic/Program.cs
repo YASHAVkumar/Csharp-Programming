@@ -2,7 +2,11 @@
 // See https://aka.ms/new-console-template for more information
 using System.Collections;
 using System.ComponentModel;
+using System.Diagnostics;
+using System.Globalization;
+using System.Net.Http.Headers;
 using System.Reflection.Metadata.Ecma335;
+using System.Runtime.CompilerServices;
 using Basic.Application;
 using Basic.Application.ArrayObj;
 using Basic.Application.ConstructorChain;
@@ -11,10 +15,13 @@ using Basic.Application.Events;
  using Basic.Application.LinQ;
 using Basic.Application.PartialMethod;
 using Basic.Application.StructureDemo;
+using Basic.Application.TasksClass;
 using Basic.Application.Threading;
 
 //using Basic.Application.Threading;
 using Basic.Domain.Model;
+// using ProductInfo=(int Id, string Name, decimal Price);
+// using NullableInt=int?;
 
 Console.WriteLine("Hello, World!");
 #if false
@@ -673,9 +680,287 @@ static void InvokeDataProcessingWithMutex(List<string> chunk, string chunkName)
 #endregion
 #endif
 
+
+#if false
+#region Tasks
+
+// Stopwatch sw =new();
+
+// sw.Start();
+// WithTask();
+// sw.Stop();
+// Console.WriteLine("with task "+ sw.ElapsedMilliseconds);
+
+// sw.Restart();
+// WithThreads();
+// sw.Stop();
+// Console.WriteLine("with thread "+ sw.ElapsedMilliseconds);
+
+StringBuilder sb=new();
+for(int i=0;i<100;i++)
+  sb.Append($"Loop value I:{i}\n");
+
+string FileName="Sample.txt";
+// FileOperation fileOperation=new();
+
+// //Task writeTask = Task.Run(() =>
+// {
+//     var w = fileOperation.FileWriter(FileName, sb.ToString());
+//     w.Wait();
+// }
+// Console.WriteLine("File write task completed, now starting file read task...");
+
+// //Task readTask = Task.Run(() =>
+
+//     Task<string> r = fileOperation.FileReader(FileName);
+//     r.Wait(); // Wait for the file read task to complete
+
+// Console.WriteLine("File read task completed.");
+// Console.WriteLine("File read content: "+r.Result);
+
+///Reading file with async await
+ FileOperationAsync fileOperationAsync=new();
+try 
+{
+
+Task writeTask = fileOperationAsync.FileWriterAsync(FileName, sb.ToString());
+await writeTask; // Wait for the file write task to complete
+}
+catch(Exception ex)
+{
+    Console.WriteLine($"Error during file write operation: {ex.Message}");
+}
+
+
+Console.WriteLine("File write task completed, now starting file read task...");
+try
+{
+string content=await fileOperationAsync.FileReaderAsync(FileName); // Wait for the file read task to complete
+Console.WriteLine("File read task completed.");
+Console.WriteLine("File read content: "+content);
+}
+catch(Exception ex)
+{
+    Console.WriteLine($"Error during file read operation: {ex.Message}");
+}
+
+static void WithTask()
+{
+    CounterDownTask counterDownTask = new();
+    CounterUpTask counterUpTask = new();
+    CancellationTokenSource cls=new();
+    //CountdownEvent countdownEvent = new(2);
+    Task<int> task1 = Task.Run(() =>
+    {
+        counterDownTask.CounterMethodDown(); //countdownEvent.Signal();
+       return -1;
+    });
+    // Task task2 = Task.Run(() =>
+    // {
+    //     counterUpTask.CounterMethodUp(); countdownEvent.Signal();
+    // });
+
+     Task<int> task2 =Task.Factory.StartNew(() =>
+    {
+          counterUpTask.CounterMethodUp(cls.Token); //countdownEvent.Signal(); 
+         
+        return 1;
+    },cls.Token);
+
+   Task task= task2.ContinueWith((antecendent)=>{
+        if(antecendent.Status==TaskStatus.Faulted)
+        Console.WriteLine($"Exception from orignal task capture here {task2.Exception.InnerExceptions.FirstOrDefault().Message}");
+        else if(antecendent.Status==TaskStatus.Canceled)
+       {
+                   Console.WriteLine("Task Cancelled");
+       }
+        else
+        Console.WriteLine("connituation of task2 "+antecendent.Result);
+        return -1;
+        }).ContinueWith((a)=>{Console.WriteLine("sfsf"+a.Result);});
+    
+    //countdownEvent.Wait();
+    // task1.Wait();
+    // task2.Wait();
+    //int index=Task.WaitAny(task1,task2);
+    // if(index==0)
+    // Console.WriteLine("Task value "+task1.Result);
+    // else 
+
+     Task.Delay(500).Wait();
+     cls.Cancel();
+
+     Console.WriteLine("Main thread working now");
+   
+}
+
+static void WithThreads()
+{
+    CounterDownTask counterDownTask = new();
+    CounterUpTask counterUpTask = new();
+    CountdownEvent countdownEvent=new(2);
+    Thread thread1= new(() =>
+    {
+           counterDownTask.CounterMethodDown(); countdownEvent.Signal();  
+    });
+Thread thread2= new(() =>
+    {
+          // counterUpTask.CounterMethodUp(); countdownEvent.Signal();  
+    });
+    thread1.Start();
+    thread2.Start();
+  countdownEvent.Wait();
+}
+#endregion
+#endif
+
+
+#region Some new features in c# 11 .net 7 and c# 12 .net 8 and c# 13 .net 9
+int x = 5;
+string multiLineString = $""" 
+    This's is a multi-line string literal in C# 11.
+    It preserves  the formatting \n and indentation as written in the code.
+    You can" {x}  include line breaks and special characters without needing escape sequences.
+    """;
+string personInfo = """
+    {
+        "FirstName": "John",
+        "LastName": "Doe",
+        "Age": 30,
+        "Gender": "Male"
+    }
+    """;
+//Console.WriteLine(multiLineString);
+//Console.WriteLine(personInfo);
+
+// List pattern matching in C# 11
+List<int> numbers = [1, 2, 3, 4, 5];
+string result = numbers switch
+{
+    [1, 2, 3, 4, 5] => "The list contains exactly 1, 2, 3, 4, 5",
+    [1, ..] => "The list starts with 1",
+    [.., 5] => "The list ends with 5",
+    [_, _, _, _, _] => "The list contains exactly five elements",
+    _ => "The list does not match any pattern"
+};
+
+// if(numbers is [1, >2, 3, 4, 5])
+//     Console.WriteLine("The list contains exactly 1, 2, 3, 4, 5");
+// else if(numbers is [1, ..])
+//     Console.WriteLine("The list starts with 1");
+// else if(numbers is [.., 5])
+//     Console.WriteLine("The list ends with 5");
+// else if(numbers is [_, _, _, _, _])
+//     Console.WriteLine("The list contains exactly five elements");
+// else
+//      Console.WriteLine("The list does not match any pattern");
+
+//Console.WriteLine(result);
+
+//Slice pattern matching in C# 11
+int[] arr = [1, 2, 3, 4, 5];
+string sliceResult = arr switch
+{
+    //[1, 2, 3, 4, 5] => "The array contains exactly 1, 2, 3, 4, 5",
+    [4, ..] => "The array starts with 4",
+    [1,..[_,3,4], 5] => "The array starts with 1 and ends with 5",
+    [_, _, _, _, _] => "The array contains exactly five elements",
+    _ => "The array does not match any pattern"
+};
+
+//Console.WriteLine(sliceResult);
+
+//var pattern
+int[] num = [10,20,30,40,50];
+{
+if(num is [var first, var second, .. var middle, var last and 50] && first == 10 && second == 20 && last == 50)
+{
+    Console.WriteLine($"First: {first}, Second: {second}, Middle: {string.Join(", ", middle)}, Last: {last}");
+}
+
+}
+
+{
+// with tuple 
+var tuple = ("Alice", "Smith", 30, "Female");
+if(tuple is var( firstName,  lastName,  age1,  gender) && firstName!=lastName && age1 == 30)
+{
+    Console.WriteLine($"First Name: {firstName}, Last Name: {lastName}, Age: {age1}, Gender: {gender}");
+}
+}
+
+Service service = new();
+service.DoWork();
+
+// no we can auto contrctort is introduced in c# 12 .net 8 for struct and record struct
+int age=5;
+string name = "John";
+PersonStruct personStruct = new(ref name, ref age);
+
+age=10;
+name="Jane";
+Console.WriteLine($"Person Struct Name: {personStruct.Name}, Age: {personStruct.Age}");
+
+// //default Lamda expression in c# 12 .net 8
+// Func<int, int> factorial = null!;
+// factorial = n => n <= 1 ? 1 : n * factorial(n - 1);
+// Console.WriteLine($"Factorial of 5: {factorial(5)}");
+// //before c# 12 we cannot assign lambda expression to a variable before its declaration because the variable is not yet initialized and it will cause a compilation error due to the use of an unassigned local function. But with default lambda expression we can assign the lambda expression to the variable even before its declaration and it will work because the variable is considered as definitely assigned when it is used in the lambda expression.
+// //Example 
+// Func<int, int> fibonacci = null!;
+// fibonacci = n => n <= 1 ? n : fibonacci(n - 1) + fibonacci(n - 2);
+// Console.WriteLine($"Fibonacci of 10: {fibonacci(10)}");
+
+// Func<int,int,int> gcd = null!;
+// gcd = (int a,int b=18) =>
+// {  
+//       if (b == 0)
+//         return a;
+
+//     return gcd(b, a % b);
+// };
+
+// Console.WriteLine($"GCD of 48 and 18: {gcd(48, 18)}");
+
+// var logMessage = (string msg, string level="Info") => Console.WriteLine($"Log: {msg} Level: {level}"));
+
+// alias any type
+// ProductInfo product = (1, "Laptop", 999.99M);
+// Console.WriteLine($"Product ID: {product.Id}, Name: {product.Name}, Price: {product.Price}");
+// NullableInt nullableInt = null;
+// if(nullableInt.HasValue)
+//     Console.WriteLine($"NullableInt value: {nullableInt.Value}");
+// else
+//     Console.WriteLine("NullableInt has no value");
+
+Student student = new()
+{
+    Id = 1,
+    Name = "John Doe",
+    ParentName = "Jane Doe Father",
+
+};
+//Console.WriteLine($"Student ID: {student.Id}, Name: {student.Name}, Parent Name: {student.ParentName},Indexer: {student[0]}");
+
+FieldKeywordDemo fieldKeywordDemo = new()
+{ Email = "john.doe@example.com", Name = "John Doe"
+};
+//Console.WriteLine($"FieldKeywordDemo Name: {fieldKeywordDemo.Name}, Email: {fieldKeywordDemo.Email},Id: {fieldKeywordDemo.ID}");
+
+var numb=new List<int>(Enumerable.Repeat(0,5))
+    {
+    [0]=1,
+    [^1]=2,
+    [1]=3,
+    [^2]=4,
+    [2]=5
+    };
+Console.WriteLine($"List with index and range initializer: {string.Join(", ", numb)}");
+
+#endregion
+
+
 Console.WriteLine("Press Enter to exit...");
 Console.ReadLine();
 
 
-
-  
