@@ -1,0 +1,25 @@
+****************************************************************
+****************************************************************
+.Net Design Patterns
+****************************************************************
+****************************************************************
+The Patterns 
+
+Creational              Structural            Behavioral 
+
+Builder                  Adapter               chain of Resposibilty
+Factories                Bridge                Command 
+   Abstract Factory      Composite             Interpreter
+   Factory Method        Decorater             Iterator
+Prototype                Facade                Mediator
+Singleton                Flyweight             Memento
+                         Proxy                 Null object
+						                       Observer
+											   State 
+											   Strategy
+											   Template Method 
+											   Visitor
+
+*********************************************************************
+
+Solid Principles (Robert C)

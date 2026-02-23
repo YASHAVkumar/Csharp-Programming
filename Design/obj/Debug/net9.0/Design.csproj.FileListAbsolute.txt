@@ -1,0 +1,15 @@
+d:\Development Enviroment\Csharp_Fundaments\Second\Design\bin\Debug\net9.0\Design.exe
+d:\Development Enviroment\Csharp_Fundaments\Second\Design\bin\Debug\net9.0\Design.deps.json
+d:\Development Enviroment\Csharp_Fundaments\Second\Design\bin\Debug\net9.0\Design.runtimeconfig.json
+d:\Development Enviroment\Csharp_Fundaments\Second\Design\bin\Debug\net9.0\Design.dll
+d:\Development Enviroment\Csharp_Fundaments\Second\Design\bin\Debug\net9.0\Design.pdb
+d:\Development Enviroment\Csharp_Fundaments\Second\Design\obj\Debug\net9.0\Design.GeneratedMSBuildEditorConfig.editorconfig
+d:\Development Enviroment\Csharp_Fundaments\Second\Design\obj\Debug\net9.0\Design.AssemblyInfoInputs.cache
+d:\Development Enviroment\Csharp_Fundaments\Second\Design\obj\Debug\net9.0\Design.AssemblyInfo.cs
+d:\Development Enviroment\Csharp_Fundaments\Second\Design\obj\Debug\net9.0\Design.csproj.CoreCompileInputs.cache
+d:\Development Enviroment\Csharp_Fundaments\Second\Design\obj\Debug\net9.0\Design.sourcelink.json
+d:\Development Enviroment\Csharp_Fundaments\Second\Design\obj\Debug\net9.0\Design.dll
+d:\Development Enviroment\Csharp_Fundaments\Second\Design\obj\Debug\net9.0\refint\Design.dll
+d:\Development Enviroment\Csharp_Fundaments\Second\Design\obj\Debug\net9.0\Design.pdb
+d:\Development Enviroment\Csharp_Fundaments\Second\Design\obj\Debug\net9.0\Design.genruntimeconfig.cache
+d:\Development Enviroment\Csharp_Fundaments\Second\Design\obj\Debug\net9.0\ref\Design.dll
