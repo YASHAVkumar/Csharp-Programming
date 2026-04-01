@@ -1,0 +1,320 @@
+Notes
+
+
+Section 19: GC, Destructors, IDisposable
+
+
+
+
+
+
+
+Lecture 1: Garbage Collection & Generations
+
+
+
+Introduction
+
+Garbage Collection (GC) is the .NET runtime's automatic memory manager. In languages like C++, developers are responsible for manually allocating and deallocating memory, a process which is a major source of bugs like memory leaks and dangling pointers. In C#, the GC simplifies this by automatically identifying and reclaiming memory occupied by objects that are no longer being used by the application. This process applies to managed memory—the memory on the heap that is managed by the .NET Common Language Runtime (CLR).
+
+
+
+How It Works: The Generational Hypothesis
+
+The C# garbage collector is highly optimized. It operates on the "generational hypothesis," which observes that most objects have a very short lifetime (e.g., local variables in a method call) while a few objects live for the entire duration of the application. Based on this, the GC divides the heap into three "generations" to manage objects efficiently.
+
+Generation 0 (Gen 0): The Nursery 🌱
+This is where all new, small objects are allocated. GC collections happen most frequently in this generation. When the GC runs on Gen 0, it's a very fast process because it only has to scan a small segment of the heap containing the most recently created objects. Any objects that are still referenced by the application after the scan are considered "survivors." They are promoted to Generation 1.
+
+• Generation 1 (Gen 1): The First Stop
+This generation contains objects that survived a Gen 0 collection. Since they have already survived one collection, the GC assumes they might live a bit longer. Therefore, Gen 1 is collected less frequently than Gen 0. When a Gen 1 collection runs, it also collects everything in Gen 0. Objects that survive a Gen 1 collection are promoted to Generation 2.
+
+Generation 2 (Gen 2): Long-Term Storage 🏛️
+This generation holds long-lived objects that have survived multiple collections (e.g., application-wide services, cached data, static objects). A Gen 2 collection is a "full" garbage collection, meaning it scans the entire managed heap (Gen 0, Gen 1, and Gen 2). This is the most time-consuming collection, so the GC runs it as infrequently as possible.
+
+Why this design? This generational approach is a major performance optimization. Instead of having to pause the application to check every single object for cleanup every time, the GC can run extremely fast, cheap collections on just the "nursery" (Gen 0), where most objects are expected to be garbage anyway.
+
+
+
+
+
+Lecture 2: Destructors
+
+
+
+Introduction
+
+A destructor, known in the CLR as a finalizer, is a special class method whose sole purpose is to clean up any unmanaged resources held by an object before that object is reclaimed by the garbage collector. Unmanaged resources are things the GC knows nothing about, like raw file handles, database connections, or window handles from the operating system.
+
+Syntax
+
+A destructor has the same name as the class, is prefixed with a tilde (~), and can have no access modifiers or parameters.
+
+class MyResourceHolder
+
+{
+
+// Destructor (Finalizer)
+
+~MyResourceHolder()
+
+{
+
+// Cleanup code for unmanaged resources would go here.
+
+Console.WriteLine("Destructor is being called.");
+
+}
+
+}
+
+
+
+How It Works: The Finalization Queue
+
+When you create an object that has a destructor, the CLR adds a pointer to it on a special list. Here's the complex process that happens when the object is no longer referenced:
+
+During a garbage collection, the GC finds the object is unreachable.
+
+Instead of reclaiming its memory, the GC sees it has a finalizer and places a reference to the object on a special finalization queue. The object is considered "alive" again for this collection cycle and survives.
+
+A dedicated, low-priority finalizer thread runs in the background. It eventually picks up the object from the queue and calls its destructor (~MyResourceHolder()).
+
+Only on a future garbage collection, after the destructor has run, can the GC finally reclaim the memory occupied by the object.
+
+
+
+Best Practices & Interview Perspective
+
+Why You Should Almost Never Use Destructors:
+
+Non-Deterministic: You have no control over when, or even if, the destructor will run. It could run immediately, or minutes later, or not at all before the application shuts down.
+
+Performance Overhead: Objects with destructors live longer (surviving at least one extra GC cycle) and add significant overhead to the collection process.
+
+Complexity: Writing them correctly, especially in a thread-safe way, is difficult.
+
+Question: "When would you implement a destructor?"
+
+Ideal Answer: "You should almost never implement a destructor directly. The standard C# pattern is to use IDisposable for deterministic cleanup of unmanaged resources. A destructor should only be used as a last-resort safety net in a class that directly owns an unmanaged resource, to ensure the resource is eventually released even if the user of the class forgets to call Dispose. It's a backup, not the primary cleanup mechanism."
+
+
+
+
+
+
+
+Lecture 3: IDisposable
+
+
+
+Introduction
+
+The IDisposable interface is the standard, recommended, and professional mechanism in .NET for providing a deterministic way for a class to release its unmanaged resources. Deterministic means the cleanup happens at a precise and predictable time—when you decide it should happen.
+
+
+
+How It Works: The Dispose() Contract
+
+The IDisposable interface is incredibly simple. It is defined in the System namespace and contains only a single method signature:
+
+public interface IDisposable
+
+{
+
+void Dispose();
+
+}
+
+A class that implements this interface is making a clear promise: "I am holding onto a scarce or expensive resource (like a file handle or database connection). When you are finished using me, you must call my Dispose() method to release that resource immediately and predictably." Inside the Dispose() method, you write the code to perform the actual cleanup.
+
+
+
+Real-World Examples
+
+Many classes in the .NET framework that deal with external resources implement IDisposable:
+
+System.IO.StreamReader and System.IO.StreamWriter (for files)
+
+System.Data.SqlClient.SqlConnection (for databases)
+
+System.Net.Http.HttpClient (for network requests)
+
+System.Drawing.Bitmap (for graphics objects)
+
+
+
+Example: A Simple File Logger
+
+public class FileLogger : IDisposable
+
+{
+
+private StreamWriter _streamWriter;
+
+private bool _isDisposed = false; // To prevent multiple dispose calls
+
+
+
+public FileLogger(string filePath)
+
+{
+
+// This opens a file handle - an unmanaged resource.
+
+_streamWriter = new StreamWriter(filePath, append: true);
+
+}
+
+
+
+public void Log(string message)
+
+{
+
+if (_isDisposed)
+
+{
+
+throw new ObjectDisposedException("FileLogger");
+
+}
+
+_streamWriter.WriteLine($"{DateTime.Now}: {message}");
+
+}
+
+
+
+// The implementation of the IDisposable contract.
+
+public void Dispose()
+
+{
+
+if (!_isDisposed)
+
+{
+
+// Release the unmanaged resource.
+
+_streamWriter.Close();
+
+_streamWriter.Dispose();
+
+_isDisposed = true;
+
+Console.WriteLine("Logger disposed. File handle released.");
+
+}
+
+}
+
+}
+
+
+
+
+
+
+
+Lecture 4: Using Declaration
+
+
+
+Introduction
+
+Calling Dispose() manually is possible, but it's risky. What if an exception occurs before the Dispose() line is reached? The resource would never be cleaned up. The using statement (and its more modern form, the using declaration) is a C# language feature that provides a convenient and completely safe syntax for working with IDisposable objects.
+
+
+
+How It Works: Syntactic Sugar for try...finally
+
+The using block is just syntactic sugar. When you write code with using, the C# compiler transforms it into a try...finally block behind the scenes. This guarantees that the .Dispose() method is always called, no matter how the code inside the block is exited—whether it completes normally or an exception is thrown.
+
+
+
+Syntax: Statement vs. Declaration
+
+using Statement (Classic):
+The object is created, and its scope is limited to the curly braces {}. Dispose() is called automatically at the closing brace.
+// logger is only accessible inside these curly braces.
+
+using (FileLogger logger = new FileLogger("log.txt"))
+
+{
+
+logger.Log("This is the first message.");
+
+logger.Log("This is the second message.");
+
+} // logger.Dispose() is automatically called here.
+
+
+
+
+
+
+using Declaration (Modern C# 8.0+):
+This is a cleaner, more concise syntax that reduces nesting. You declare the variable with using, and its scope lasts until the end of the containing block (usually the end of the method). Dispose() is automatically called when the scope is exited.
+public void DoLogging() {
+
+using var logger = new FileLogger("log.txt");
+
+logger.Log("This is a message.");
+
+
+
+// logger can be used throughout the rest of the method.
+
+if (true)
+
+{
+
+logger.Log("Another message.");
+
+}
+
+
+
+} // logger.Dispose() is automatically called here, at the end of the DoLogging method.
+
+
+
+
+
+
+
+Best Practice: Always use a using statement or declaration when working with any object that implements IDisposable. It is the safest and cleanest way to ensure resources are released correctly.
+
+
+
+
+
+Lecture 5: Things to Remember
+
+
+
+GC Manages Memory, You Manage Resources
+This is the core takeaway. The Garbage Collector is excellent at managing managed memory (objects on the heap). It knows nothing about unmanaged resources (file handles, database connections, network sockets). You are responsible for releasing unmanaged resources deterministically, and IDisposable is the standard pattern for doing so.
+
+Avoid Destructors: Favor IDisposable
+Destructors should be seen as a last-resort safety net, not a primary resource management tool. They are non-deterministic, have performance overhead, and complicate garbage collection. Always prefer implementing IDisposable for predictable, immediate cleanup.
+
+Always Use 'using' for IDisposable Objects
+The using statement/declaration is not optional; it is the best practice for ensuring Dispose() is always called, even in the face of exceptions. It makes your code significantly safer and cleaner.
+
+The Full "Dispose Pattern" (Advanced Interview Topic)
+
+Question: "How would you correctly implement IDisposable in a class that also has a destructor?"
+
+Ideal Answer: "You implement the full Dispose Pattern. The class implements IDisposable. You create a protected virtual void Dispose(bool disposing) method.
+
+The public Dispose() method calls Dispose(true) and then GC.SuppressFinalize(this). SuppressFinalize tells the GC that you've already cleaned up, so it doesn't need to run the destructor, which is a key performance optimization.
+
+The destructor (~ClassName()) calls Dispose(false).
+
+The Dispose(bool disposing) method does the actual work. Inside an if (disposing) block, it cleans up both managed and unmanaged resources. The part outside this check (or in an else) cleans up only unmanaged resources. This pattern ensures that resources are cleaned up correctly whether Dispose is called manually (the normal case) or by the finalizer thread (the backup case)."
+
+
+

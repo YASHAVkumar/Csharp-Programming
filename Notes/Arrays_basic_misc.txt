@@ -1,0 +1,1298 @@
+Expression  bodied member 
+   public className(param1) => flield = param1;  //constructior
+   
+   public type property
+   {
+   set => field =value;
+   get=> field;
+   }
+   
+------------------------  
+  C# 8.0
+  
+ switch expression 
+    opreation switch 
+	{
+	  value1 => result1,
+	  value2 => result2,
+	  
+	  
+	  _=> defaultresult 
+	
+	}
+-------------------------
+Arrays  [System.Arrays]
+ 
+  Array is group of multiple values of same type 
+  Array are stored in continous - memory location in heap
+  
+  
+  foreach --- from start to end 
+  
+---------------
+binary search for already sorted array only 
+
+Array.Clear(a,0, a.length)
+Array.Resize(ref arr,newsize)  //copy new array
+
+Array.Sort(a) // asc, use quick sort algo internally 
+Array.Reverse(a)
+  
+Multi dem array 
+ {
+   row[][]
+ }
+ 
+ type[,] arrayRefVAr=new type[rowSize, columnSize]
+ Jagged Array 
+ int[][] objarr=new int[rowSize][];
+ for(i=0;i<objarr.lenght;i++)
+ {
+   for(j=0;j<objarr[i].length;j++){
+   }
+ }
+ 
+---------------------------------------
+we can store array[index]=obj into heap 
+
+Emp[] emp=new Emp[]{
+  new Emp(){id=1,name='yash'},
+  new Emp(){id=2,name='myra'}
+}
+
+foreach(var i in emp){}
+-------------------------------
+Array.Clone() vs Array.CopyTo()
+int[] src=new int[3]{0,1,2};
+int[] dest=new int[3];
+
+src.CopyTo(dest,startIndex)  // same copy 
+                            //shallow copy 
+dest=(cast[])src.Clone()  //1. return type object so cast needed 
+                          //2. creates a new array by using identifing user class & copies 
+						  // from source array to that new array
+                          // shallow copy 
+------------------------------
+Shallow copy and deep copy 
+
+1. Shallow copy of an array 
+   creates a new array but copies only the reference of nested object/array - not the actual data
+   {
+     const org=[{id:1},{id:2}]
+	 const shallowCpy= [...org];// 
+     shallowCpy[0].id=99;
+	 //changed values of both array
+   
+   }
+  
+***********************
+  Person[] original =
+        {
+            new Person { Name = "Myra" },
+            new Person { Name = "Alex" }
+        };
+		
+		 Person[] shallowCopy = (Person[])original.Clone();
+
+        shallowCopy[0].Name = "Changed";
+		///changed orignal arr[0]
+
+***********************   
+   
+2. deep copy of an array
+   create a new array and fully duplicates -- not affecte orginal array
+   {
+     const org=[{id:1},{id:2}]
+	 const deepCpy= JSON.parse(JSON.stringify(original));;// 
+      deepCpy[0].id = 99;
+	 //not changed values of org array
+   
+   }
+***************************
+Person[] original =
+        {
+            new Person { Name = "Myra" },
+            new Person { Name = "Alex" }
+        };
+
+        Person[] deepCopy = new Person[original.Length];
+
+        for (int i = 0; i < original.Length; i++)
+        {
+            deepCopy[i] = new Person   // create new object copy in stack index 
+            {
+                Name = original[i].Name
+            };
+        }
+
+        deepCopy[0].Name = "Changed";
+
+        Console.WriteLine(original[0].Name); // Myra ✅
+***************************
+
+
+NOTE :-  
+Primitive Types Exception
+For primitive types, shallow copy behaves like deep copy because values are copied.
+{because use store in stack not in heap }
+
+
+int[] a = { 1, 2, 3 };
+int[] b = (int[])a.Clone();
+
+b[0] = 99;
+
+Console.WriteLine(a[0]); // 1 ✅
+
+***************************************
+ICloneable Interface - to follow standard of clonning because 
+ public Emp CreateNewEmp()
+    {
+       return new Emp(this.Id, this.Name) { Salary = this.Salary };
+    }
+
+Can be anyname for creating new objects so implement ICloneable 
+{
+  clone(){
+   return new obje;
+   }
+}
+
+***********************Collections***********************
+System.Collections.Generic;
+List<type> ref =new List<type>();  
+//create reference var for list class &  create obj of List class store in heap
+// Is is dynamically sized 
+// it allows duplicates values 
+// it is index-based. 
+// internally use array 
+
+add(ele) addRange(IEnumaralbe ek) // add at last 
+insert(index,Item), insertRange(index,list())  // list shift towards right
+remove(item), removeAt(index) //list shift left if index not found  then runtime 
+removeRange(index,count) , removeAll(n=> n%2==0) //receive predicate of int    //remove first occursance
+numbers.Clear()
+
+*****************
+IndexOf(20) // gives index else -1   //linear search 
+IndexOf(value,startIndex)
+int BinarySearch(value)  //on sorted list
+Contains(5)  //linear search
+
+*********************
+Sort() //asc order
+OrderBy(n=>n)
+Reverse() //reverse list
+To.Array()
+
+*****************
+ForEach(Action<T>)  //return void 
+Exists(Predicate<T>)  //List.Exist(n=>n>15) //check all occurance
+Find(Predicate<T>), FindIndex(val) //return first match element else return default value of datatype
+List<T> FindAll(Predicate<T>) //return all match expression List else return emptyList()
+FindLast(x=>x>15), FindLastIndex(x=>x>15 ) //return element,index from last
+List<OutDatatype>ConvertAll(x=>Convert.ToDouble(n)) 
+
+*******************
+Dictionary<TKey,TValue>() objDic= new Dictionary<TKey,TValue>(); 
+// Keyvalue pair  && key not null or dublicaties value can be null or duplicates
+//access by key not on index 
+
+ContainsKey(key)
+ContainesValue(key)
+TryGetValue(key, out string? value)
+Clear()
+            
+
+SortedList<int,string> obj= new()
+{
+    {3, "Three" },
+    {1, "One" },
+    {2, "Two" }
+}			 //gives sort dictonary based of key
+             // fast not perform linear search
+			 //insert slow sort first then add 
+			 // storage asc order based on keys
+IndexOfKey(key)
+IndexOfValue(val)
+Remove(key)
+
+************************************
+System.Collections.Hashtable
+Hashtable obj=new Hashtable(); // contains group of elements of key/value stored ar respective index-based 
+          //Storage radomally calculate index and store linq list 
+		  
+=> Process of adding an element 
+ 1. Genreate index based on the key. Ex: index=hash code % size of dictonary
+ 2. Add the element ( key and value ) next to linked list at the generated index. 
+	
+	[0] -> [key,val][] -> [key,value][] -> [key,val][] -> [key,value][]-> null
+	[1]->[key,val][] -> [key,value][] ->null
+	[2] -> [key,val][] -> null
+	[3] -> null
+// number is hascode
+// for the use intenal generated hash code
+
+Hashtable hashtable = new Hashtable();
+hashtable.Add(1, "One");    
+hashtable.Add(2, "Two");
+hashtable.Add(3, "Three");
+hashtable.Add("four", 4);  //return object
+
+foreach (DictionaryEntry entry in hashtable)
+{
+    Console.WriteLine($"Key: {entry.Key}, Value: {entry.Value}");
+}
+/// cons return object so we we type cast every time to get value
+//not Generic 
+// not indexof 
+ 
+ 
+ Hashtable hashtable = new Hashtable();
+hashtable.Add(1, "One");    
+hashtable.Add(2, "Two");
+hashtable.Add(3, "Three");
+hashtable.Add("four", 4);  //return object
+
+foreach (DictionaryEntry entry in hashtable)
+{
+    Console.WriteLine($"Key: {entry.Key}, Value: {entry.Value}");
+}
+
+ 
+/******************************/
+System.Collections.Generic.hashset;
+
+Hashset<value>  -- default capacity is 17  after then new memory
+                -- index generated based on value because no key 
+				-- other same as hashtable 
+				-- dublicaties will ingore because store at same position
+				-- return insert order 
+                -- allows one null 
+
+	
+HashSet<string> hashSet = new HashSet<string>();
+hashSet.Add("Apple");
+hashSet.Add("Banana");
+hashSet.Add("Orange jk");
+hashSet.Add("Apple"); //duplicate, will be ignored
+//remove items based on condition
+hashSet.RemoveWhere(fruit => fruit.Contains("jk"));
+//join two sets
+hashSet.UnionWith(new List<string> { "Grapes", "Mango" });
+//return common items
+hashSet.IntersectWith(new List<string> { "Banana", "Grapes", "Pineapple" });
+Console.WriteLine(hashSet.Contains("Grapes"));
+foreach (var item in hashSet)
+{
+    Console.WriteLine(item);
+}
+
+*************************************
+System.Collections.ArrayList;
+ArrayList ref=new ArrayList() // what type of val in list 
+
+ ArrayList arrayList = new ArrayList();
+    arrayList.Add(1);
+    arrayList.Add("Two");
+    arrayList.Add(3.0);
+    arrayList.Add(true);
+    arrayList.Add(DateTime.Now);
+    arrayList.Add(new Emp(2, "Jane Smith") { Salary = 2000M });
+    foreach (var item in arrayList)
+    {
+        if(item is Emp empItem)
+        {
+            Console.WriteLine($"Emp Item - Id: {empItem.Id}, Name: {empItem.Name}, Salary: {empItem.Salary}");
+        }
+        else
+        Console.WriteLine($"Item: {item}, Type: {item.GetType()}");
+    }
+*****************
+System.Collections.Generic.Stack
+
+Stack<T> refVar= new Stack<T>(); // LIFO  (bottom to top insert)
+
+PUSH()  // first add at bottom 
+,Pop()  //removes from top  
+,Peek() // get top element from stack
+
+Stack stack = new();
+    stack.Push(1);
+    stack.Push("Two");
+    stack.Push(3.0);
+    stack.Push(true);
+
+    while (stack.Count > 0)
+    {
+        var U=stack.Peek();
+        Console.WriteLine($"Peek Item: {U}, Type: {U.GetType()}");
+        var item = stack.Pop();
+        Console.WriteLine($"Popped Item: {item}, Type: {item.GetType()}");
+    }
+    Console.WriteLine("Stack is empty.");
+	
+************************
+System.Collections.Generic.Queue 
+Queue<T> refVal= new Queue<T>();   // FIFO  
+ rear [] front
+  
+1.. race  first at first read  front
+2. Last added item at rear     
+
++ Enqueue()
+- Dequeue()
+Peek()
+ // No New element add middle based on index  flollow Fifo in queue and lifo in stack
+ 
+ Queue<string> queue = new();
+    queue.Enqueue("task one");  
+    queue.Enqueue("task two");
+    queue.Enqueue("task three");
+    queue.Enqueue("task five");
+    queue.Enqueue("task four");
+    while (queue.Count > 0)
+    {
+         var U=queue.Peek();
+        Console.WriteLine($"Peek Item: {U}, Type: {U.GetType()}");
+       
+        var item = queue.Dequeue();
+        Console.WriteLine($"Dequeued Item: {item}");
+    }
+	
+************************************
+Collection of Objects 
+
+List<Product> = new();
+
+///summary   //xml summary represents sumarry of class in tooltip
+
+///
+
+
+Object Relations -> An object can contains a field that store reference to one or more object
+1. One to one Relation 
+ 
+ class Student 
+ {
+   Branch bracnh;  ----> object of branch class 
+   
+	}
+	
+2. one to many Relation 
+	
+	 
+ class Student 
+ {
+   List<Examination> obj ;
+ }
+
+3. Many to one Relation 
+
+ class Emp 
+{
+   Department depart;  ----> object of branch class  
+}
+Emp emp1 all have one   Department depart
+Emp emp2 Department depart
+Emp emp3 Department depart
+
+*****************Collection Hierarchy *******
+
+Iterator :-  
+
+var list = new List<int> { 10, 20, 30 };
+
+var enumerator = AsEnumerator(list);
+
+while (enumerator.MoveNext())
+{
+    Console.WriteLine(enumerator.Current);
+}
+
+static IEnumerator<int> AsEnumerator(List<int> list)
+{
+    for (int i = 0; i < list.Count; i++)
+    {
+        yield return list[i];
+    }
+}
+
+*************************************************************************
+*************************************************************************
+Constructors (Advanced)
+
+public class EmployeeApp
+{
+  private string _name;
+    private int _age;
+    private decimal _salary;
+    private DateTime _joiningDate;
+    //Master constructor calling all
+   public EmployeeApp(string name, int age, decimal salary, DateTime joiningDate)
+    {
+        _name = name;
+        _age = age;
+        _salary = salary;
+        _joiningDate = joiningDate;
+
+        if(_age <18 || _age >65)
+        {
+            this._age = 18; //default age
+        }
+        if(_salary <30000M)
+        {
+            this._salary = 30000M; //default salary
+        }
+    } 
+    //Constructor chaining - calling master constructor
+    public EmployeeApp(string name, int age):this(name, age,30000M,DateTime.Now)
+    {
+        Console.WriteLine("2nd Constructor called");
+    } 
+    //Constructor chaining - calling 2nd constructor
+    public EmployeeApp(string name):this(name,50)
+    {
+        Console.WriteLine("3rd Constructor called");
+    }
+
+    public void DisplayEmployee()
+    {
+        Console.WriteLine($"Name: {_name}, Age: {_age}, Salary: {_salary}, Joining Date: {_joiningDate.ToShortDateString()}");
+    }
+}
+
+main(){
+ EmployeeApp empApp = new ("Alice", 28, 50000M, new DateTime(2020, 5, 1));
+empApp.DisplayEmployee();
+EmployeeApp empApp2 = new ("Bob", 35);
+empApp2.DisplayEmployee();
+EmployeeApp empApp3 = new ("Charlie");
+empApp3.DisplayEmployee();
+}
+
+--- No code dublicaties 
+-- validation logic exists in one place 
+
+
+--------------------------------------
+private constructors 
+
+
+public class ScoreManager
+{
+    private static ScoreManager _instance;
+    private static readonly object _lock = new();
+
+    public int Score { get; private set; }
+
+    private ScoreManager()
+    {
+        Score = 0;
+    }
+
+    public static ScoreManager GetInstance()
+    {
+        if (_instance == null)
+        {
+            lock (_lock)
+            {
+                if (_instance == null)
+                {
+                    Console.WriteLine("Creating new instance of ScoreManager");
+                    _instance = new ScoreManager();
+                }
+
+                //_instance ??= new ScoreManager();
+            }
+        }
+        return _instance;
+    }
+
+    public void AddScore(int points)
+    {
+        Score += points;
+    }
+    public void ResetScore()
+    {
+        Score = 0;
+    }
+    public void DisplayScore()
+    {
+        Console.WriteLine($"Current Score: {Score}");
+    }
+}
+
+main(){
+  ScoreManager scoreManager = ScoreManager.GetInstance();
+scoreManager.AddScore(10);
+scoreManager.DisplayScore();
+//Console.WriteLine($"Score after first addition: {scoreManager.Score}");
+ScoreManager anotherInstance = ScoreManager.GetInstance();
+anotherInstance.AddScore(20);
+scoreManager.DisplayScore();
+anotherInstance.ResetScore();
+ScoreManager thirdInstance = ScoreManager.GetInstance();
+thirdInstance.DisplayScore();
+if(ReferenceEquals(scoreManager, anotherInstance) && ReferenceEquals(anotherInstance, thirdInstance))
+Console.WriteLine(  "Are all instances the same? " + (scoreManager == anotherInstance && anotherInstance == thirdInstance));
+
+}
+
+
+--- Only one --> scoreManager class object -> data consistency --> Singleton Pattern 
+
+-----------------------------------------------------------
+Anonymous Types Or Anonymous clasess--- 
+var referenceVar = new {Prop1 =val1, Prop2=value .... }
+
+ // Anonymous class -- Random generated class 
+ // Auto Generated Random class have Anonymous Types at compile time 
+ // Sealed class 
+ //property are readonly and public 
+ // no extenstion method created 
+ // not null assignment 
+var person =new{ FirstName="John", LastName="Doe", Age=30};
+Console.WriteLine($"Person: {person.FirstName} {person.LastName}, Age: {person.Age}");
+
+
+------------------------------------------------------
+Nested Anonymous Objects 
+
+
+var person =new{ FirstName="John", LastName="Doe", Age=30,Gender="Male"};
+var person1 =new{ FirstName="Myra", LastName="Doe", Age=40,Gender="Female"};
+
+var family = new
+{
+    id=1,
+    Parents=person,
+    Children=new { FirstName="Jim", LastName="Doe", Age=5 }
+};
+var family2 = new
+{
+    id=2,
+    Parents=person1,
+    Children=new { FirstName="Mri", LastName="yash", Age=5 }
+};
+
+var village= new[]
+{
+    family,
+    family2
+};
+
+village.ToList().ForEach(f=>
+{
+    Console.WriteLine($"Family Id: {f.id}");
+    Console.WriteLine($"Parent: {f.Parents.FirstName} {f.Parents.LastName}, Age: {f.Parents.Age}");
+    Console.WriteLine($"Child: {f.Children.FirstName} {f.Children.LastName}, Age: {f.Children.Age}");
+});
+
+
+-----------------------------------------------------------------------------
+Creating Anonymous array/ Implicity typed array
+
+Refer to last code of nested anonymous 
+
+var village= new[]
+{
+    family,
+    family2
+};
+-- Note -- all properties must be same in anonymous object also same order 
+// if do this what should be datatype of array
+// Strongly typed 
+
+---------------------------------------------------------------------
+Sytem.VaueTyple // for lower versions
+
+Tuples class -- c#4.0  // overcome problem of anonymous object datatype casting 
+
+
+var referenceVar = new Tuples<type1, type2...>(){val1, val2...}
+referenceVar.Item1
+referenceVar.Item2  
+
+//Note- store upto 8 in general  after nested typle used 
+var person =new Tuple<string, string, int, string>("John", "Doe", 30, "Male");
+//person.Item1="Jane"; //Tuple items are read-only
+
+Console.WriteLine($"Person: {person.Item1} {person.Item2}, Age: {person.Item3}, Gender: {person.Item4}");   
+
+
+Value Tuples  -- c#7.1
+-- item1, item2 gives confusion so it introduces 
+--- unlimited values
+(type filedName1,type fieldName2...) reference= (value1, value2 ....)
+reference.filedName1 //return value 1 
+
+(string FirstName, string LastName, int Age, string Gender) personTuple = ("John", "Doe", 30, "Male");
+
+personTuple.FirstName="Jane"; //Tuple items are normally mutable
+Console.WriteLine($"Person: {personTuple.FirstName} {personTuple.LastName}, Age: {personTuple.Age}, Gender: {personTuple.Gender}");
+ 
+ // OR 
+ (string , string, int, string) personTuple = ("John", "Doe", 30, "Male");
+Console.WriteLine($"Person: {personTuple.Item1} {personTuple.Item2}, Age: {personTuple.Item3}, Gender: {personTuple.Item4}");
+
+// Note - REturn get set filed 
+
+
+Deconstruction -- coping element from value types into local var
+
+(string FirstName, string LastName, int Age, string Gender)  = personTuple;   // into local var
+Console.WriteLine($"Deconstructed Person: {FirstName} {LastName}, Age: {Age}, Gender: {Gender}"); 
+
+
+Discards -- skipping elements while deconstruction  -- using _ 
+
+(string FirstName, _, int Age, string Gender)  = personTuple;
+Console.WriteLine($"Person: {FirstName}, Age: {Age}, Gender: {Gender}");
+
+
+
+------------------------------------------------------------------------
+System.Linq;
+LINQ  --Language Integrated Query 
+
+Linq is a uniform query syntax that allows you to retrive data from various data sources 
+such as array, collection, databases, xml files 
+
+
+dev ----uses--> LINQ ---To retrive data --> 1. collection of objects (Linq to collections)
+                                            2. sql server database (Linq to sql )
+                                            3. Entity framework dbset (Linq to entites)
+											4. ADO.NET Dataset (Linq to dataset)
+											5. XML FIlES (Linq to XML)
+											
+Example 1 :- 
+            // Implementation of LinQ examples
+            List<Person> people = [
+            
+                new Person { FirstName = "John", LastName = "Doe", Age = 30, Gender = "Male" },
+                new Person { FirstName = "Jane", LastName = "Smith", Age = 25, Gender = "Female" },
+                new Person { FirstName = "Sam", LastName = "Brown", Age = 40, Gender = "Male" } 
+       
+            ];
+            // new list of people not actually valid syntax, just for illustration
+            var adults = people.Where(person => person.Age >= 18 && person.Age < 30);
+            var adults1 = from person in people
+                         where person.Age >= 18 && person.Age < 30
+                         select person;
+
+            foreach (var adult in adults)
+            {
+                Console.WriteLine($"You are Young Guns {adult.FirstName} {adult.LastName}, Age: {adult.Age}, Gender: {adult.Gender}");
+            }
+
+
+Extension Methods in LINQ
+ 
+| **Category**       | **LINQ Methods**                                                                                                   | **SQL Equivalent**                            |
+| ------------------ | ------------------------------------------------------------------------------------------------------------------ | --------------------------------------------- |
+| **Filtering**      | `Where`, `OfType`                                                                                                  | `WHERE`                                       |
+| **Sorting**        | `OrderBy`, `OrderByDescending`, `ThenBy`, `ThenByDescending`, `Reverse`                                            | `ORDER BY ASC / DESC`                         |
+| **Grouping**       | `GroupBy`                                                                                                          | `GROUP BY`                                    |
+| **Join**           | `Join`                                                                                                             | `INNER JOIN`                                  |
+| **Projection**     | `Select`(new obje() =>return list), `SelectMany`                                                                                             | `SELECT`, `JOIN / CROSS APPLY`                |
+| **Aggregation**    | `Average`, `Count`, `Max`, `Min`, `Sum`                                                                            | `AVG()`, `COUNT()`, `MAX()`, `MIN()`, `SUM()` |
+| **Quantifiers**    | `All`, `Any`, `Contains`                                                                                           | `NOT EXISTS`, `EXISTS`, `IN`                  |
+| **Elements**       | `First`, `FirstOrDefault`, `Last`, `LastOrDefault`, `Single`(check only one ), `SingleOrDefault`, `ElementAt`, `ElementAtOrDefault` | `TOP 1`, `ORDER BY + TOP`, `OFFSET/FETCH`     |
+| **Set Operations** | `Distinct`, `Union`, `Intersect`, `Except`                                                                         | `DISTINCT`, `UNION`, `INTERSECT`, `EXCEPT`    |
+| **Partitioning**   | `Skip`, `Take`, `SkipWhile`, `TakeWhile`                                                                           | `OFFSET`, `FETCH`, `ROW_NUMBER()`             |
+| **Concatenation**  | `Concat`                                                                                                           | `UNION ALL`                                   |
+| **Equality**       | `SequenceEqual`                                                                                                    | Row-by-row comparison                         |
+| **Generation**     | `Range`, `Repeat`, `Empty`, `DefaultIfEmpty`                                                                       | CTE / Numbers table / `LEFT JOIN`             |
+
+
+**********************************************************************************************
+Topic to be covered Soon 
+ 1. String, Datetime, Math 
+ 2. IO, Serialization, Encoding
+ 3. Exception Handling 
+ 4. Bank Project -- Adding Functionality  
+
+-------------------------------------------------
+Top Level Statements --6.0 C#
+no void main 
+--- no namespace after top level statement 
+--- only file have top level statement  else error
+-- we cannot access top level variable in  local namespace
+-- top level internally -- class program { static void main(){} }
+
+--------------------------------------
+File Scoped Namespaces 
+namespace  name
+class class_name
+{
+}
+
+-- no other file have that namespace
+-- no normal namespace declare if we use file scoped 
+
+-------------------------------------------------------
+Global using directives 
+
+global using namespace_name; //imported in all other files in the current project
+
+works for all file in same project 
+{
+global using Basic.Domain.Model;
+global using System;
+global using System.Collections.Generic;
+global using System.Linq;
+global using System.Text;
+global using System.Threading.Tasks;
+}
+
+List of namespace are implicitly imported in every c# 
+{
+ System
+ System.Collections.Generic
+ System.IO
+ System.Linq
+ System.Net.Http
+ System.Threading
+ System.Threading.Tasks
+}
+    <ImplicitUsings>enable</ImplicitUsings>
+	
+	
+---------------------------
+Module Initializers 
+
+class class_name 
+{
+  [ModuleInitializer]                      --runs at --> application startup (before main)
+  internal static void method_name()        --initilize data string 
+                                            --we can uer multiple run alphabetcally
+											--use different file to call initializers to made sequence
+							
+}
+
+Use casess: - 
+ Loading environment variables 
+ Initializing connection strings /database server namespace
+ Initializing URL's of API servers
+ Loading Azure connection stings
+ Intializing file path
+
+---------------------------------------------
+Nullable Reference types 
+
+class_name? variable_name; // is nullable reference type 
+
+-----------------------------------------
+null forgiving opretor (!)
+	Example? linqExample = new();
+	linqExample!.Run();   //100% sure it is not null
+
+------------------------------------------
+Target -typed -- new() == new class_name() based on target reference take auto
+
+--Note :-- not allowed using ( var f =new()){} ){} same as foreach
+
+-------------------------------------------
+Pattern Matching 
+
+1. is expression
+   if(variable_name is class_name another_variable){}
+
+2. switch-case expression
+   switch(variable_name)
+   { 
+     case class_name another_variable
+	   when another_variable.property== value;
+	     statement...
+	  break;
+   }
+
+3. switch expression
+   variable_name switch {
+     class_name another_variable 
+	 when another_variable.prop == value => result_expression
+	 _=> variable_name
+	 }
+	 
+4. Relational Pattern 
+   variable switch 
+   {
+     class_name another_variable when 
+	    another_variable.prop is value  // ==
+		another_variable.prop is < value // <
+		another_variable.prop is > value  // >
+		another_variable.prop is <= value // <=
+		another_variable.prop is >= value // <=
+		=> result_expression
+   }
+// string result = person switch {
+// Person p when p.Age is < 20 and >= 13 => $"{p.Name} is Adult",
+// Person p when p.Age is < 10 and >= 19 => $"{p.Name} is child",
+// Person p when p.Age is >= 60 and not(100 or 200 ) => $"{p.Name} is senior",
+// _ => "" }  
+
+
+*******************************************************
+
+Property Pattern 
+
+string result = person switch {
+Person  {Age: < 30 and >= 15 } p=> $"{p.FirstName} is Adult",
+Person {Age: < 10 and >= 2 } p=> $"{p.FirstName} is child",
+Person {Age: >= 60 and not(100 or 200 )} p => $"{p.FirstName} is senior",
+_ => "Age not categorized" 
+} ; 
+
+Extended Version
+
+string result = person switch {
+Person  {Age: < 30 and >= 15,Gender: "Female" }  p=> $"{p.FirstName} is Adult female",
+Person {Age: < 10 and >= 2 } p=> $"{p.FirstName} is child",
+Person {Age: >= 60 and not(100 or 200 )} p => $"{p.FirstName} is senior",
+_ => "Age not categorized" 
+} ; 
+
+Console.WriteLine(result);
+
+**************************
+Tuple Pattern 
+
+ var str= (person.FirstName, person.Age,person.Gender)  switch {
+    ("Alice", < 30, "Female") => "Alice is a young female",
+    ("Bob", >= 30, "Male") => "Bob is an adult male",
+    (_, >=60 and < 100, _) => $"{person.FirstName} is a senior citizen",
+    ("Charlie",not (65 or 55), "Male") => "Charlie is a male",
+    _ => "Person not categorized"
+ };
+Console.WriteLine(str);
+
+***********************************************************
+Postinal Pattern 
+Person
+{
+    public void Deconstruct(out string firstName,out int age, out string gender)
+    {
+        firstName = this.FirstName;
+        age = this.Age;
+        gender = this.Gender;
+		//Asgin sorcut
+		//(firstName, age, gender) = (this.FirstName, this.Age, this.Gender);
+
+    }
+}
+
+Person person = new() { FirstName = "Bob", LastName = "Johnson", Age = 30, Gender = "Male" };
+
+var str1= person switch {
+    ("Alice", < 30, "Female") => "Alice is a young female",
+    ("Bob", >= 30, "Male") => "Bob is an adult male",
+    (_, >=60 and < 100, _) => $"{person.FirstName} is a senior citizen",
+    ("Charlie",not (65 or 55), "Male") => "Charlie is a male",
+    _ => "Person not categorized"
+ };
+
+*************************************
+Nested Propert Pattern: C# 10
+
+ var str2= (person.FirstName, person.Age,person.Gender, person.DateInfo.CurrentDateTime)  switch {
+    ("Alice", < 30, "Female", _) => "Alice is a young female",
+    ("Bob", > 30, "Male", _) => "Bob is an adult male",
+    (_, >=60 and < 100, _, _) => $"{person.FirstName} is a senior citizen",
+    ("Charlie",not (65 or 55), "Male", _) => "Charlie is a male",
+    (_, _, _, DateTime dt) when dt.DayOfWeek == DayOfWeek.Sunday => $"{person.FirstName}'s info recorded on Sunday",
+    _ => "Person not categorized"
+ };
+var tomorrow = DateTime.Today.AddDays(1);
+
+string result1 = person switch
+{
+    Person { Age: < 30 and >= 15, Gender: "Female" } p
+        => $"{p.FirstName} is Adult female",
+
+    Person { Age: < 10 and >= 2 } p
+        => $"{p.FirstName} is child",
+
+    Person { Age: >= 60 and not (100 or 200) } p
+        => $"{p.FirstName} is senior",
+
+    Person { Age: >= 30 and < 60, Gender: "Male" } p
+        when p.DateInfo?.CurrentDateTime.Date >= tomorrow
+        => $"{p.FirstName} is Adult male",
+
+    _ => "Age not categorized"
+};
+
+
+///
+1. Nested Property Pattern 
+  variable switch 
+  {
+    {outer_prop :{nested_prop:val}}
+  }
+2. Extended Property Pattern (C#)
+  variable switch 
+  {
+    {outer_prop.nested_prop:val}
+  }
+
+///
+
+***************************************
+Need of Immutability
+
+Immutable calsses   //only get accessor their 
+ clas class_name{
+   data_type readonly field_name;
+   data_type prop_name{get=>field_name}
+   public class_name(){ field_name=value;}
+ }
+ 
+****************************************
+'init' only properties can be initialized either inline with declaration in the 
+constructor or in the object initialzer.
+
+data_type prop_name{get;init;}  // init of set
+
+only object initializers we can initialized prop
+
+**************************************************
+
+Readonly Structs 
+
+
+public readonly struct Structure
+{
+    public int X { get; init; }
+    public int Y { get; init; }
+
+    public Structure(int x, int y)
+    {
+        X = x;
+        Y = y;
+    }
+}  
+
+by using primary constructor it is equivalant to 
+
+public readonly struct Structure(int x, int y)
+{
+    public int X { get; init; } = x;
+    public int Y { get; init; } = y;
+}
+
+Structure structDemo = new(){ X = 10, Y = 20};
+//structDemo.X=78; // This line will cause a compilation error since X has init-only setter
+
+
+Notes:- 
+// propertry are readonly 
+//paramerless constructor is not supported is struct but param constructor does before c#10
+
+// param less constructor  in C# then initlize all feild
+// new keyword here is not object initlize but calling contructors
+
+FULL CODE :
+namespace Basic.Application.StructureDemo;
+public readonly struct Structure(int x, int y)
+{
+    private readonly int _x = x;
+    private readonly int _y = y;
+    public int X { get; init; } = x;
+    public int Y { get; init; } = y;
+
+    public Structure() : this(0, 0)
+    {
+    }
+}
+
+********************************************************
+Records  C# 9
+
+record record_name(data_type Property1, data_type prop...);
+
+EQUALS TO
+
+public record_name(int x, int y)
+{
+    private readonly int _x = x;
+    private readonly int _y = y;
+    public int X { get; init; } = x;
+    public int Y { get; init; } = y;
+
+    public record_name() : this(0, 0)
+    {
+    }
+}
+
+
+// not set here default get init there
+
+RecordStruct recordStruct = new(5, 10);
+// recordStruct.A=15; // This line will cause a compilation error since A is readonly
+Console.WriteLine($"RecordStruct A: {recordStruct.A}, B: {recordStruct.B}");
+
+NOTE :
+ Concise syntax to create a reference type with immutable properties
+ public record struct RecordStruct(int A, int B) immutable
+ public record class RecordStruct(int A, int B)  mutable
+ we can make record  mutable but adding public one or two properites
+ Equailty
+	  record r1=new()
+	  record r2=new()
+	  r1= r2 //true 
+	  r1.Equals(r2) //true compare values 
+ 
+// refrence copy vs Shallow vs deep 
+
+RecordStruct recordStruct = new(5, 10)
+{   
+    Info = "Sample Record Struct"
+};
+//refrence copy modifies both
+RecordStruct recordStruct2 = recordStruct;
+// shlallow copy not affect original
+RecordStruct recordStruct3 = recordStruct with { Info= "Modified Record Struct 3" };
+//deep copy not affect original
+RecordStruct recordStruct4 = new (recordStruct.A, recordStruct.B)
+{ Info= "Modified Record Struct 4" };
+
+Console.WriteLine($"RecordStruct A: {recordStruct.A}, B: {recordStruct.B}, Info: {recordStruct.Info}");
+Console.WriteLine($"RecordStruct2 A: {recordStruct2.A}, B: {recordStruct2.B}, Info: {recordStruct2.Info}");
+Console.WriteLine($"RecordStruct3 A: {recordStruct3.A}, B: {recordStruct3.B}, Info: {recordStruct3.Info}");
+Console.WriteLine($"RecordStruct4 A: {recordStruct4.A}, B: {recordStruct4.B}, Info: {recordStruct4.Info}");
+
+
+
+Deconstruct() // copy object to local field auto generated in records // '_' use dicard
+  (int a,int b)=recordStruct;
+   var (x,y)= recordStruct;
+   Console.WriteLine($"Deconstructed Structure X: {x}, Y: {y}");
+   Console.WriteLine($"Deconstructed RecordStruct A: {a}, B: {b}");
+
+Console.WriteLine($"{recordStruct.ToString()|| recordStruct}");
+RecordStruct { A = 5, B = 10, Info = Sample Record Struct }
+
+
+Pre defined and user defined Constructor 
+
+public record_name(param):this(param) //invokes compiler-generated constructor
+{
+  propert= name;
+}
+or 
+
+public RecordStruct() : this(0, 0)
+    {
+        Info = "Default Info";
+    }
+	
+// Note:- 
+   1 Record internally is class  so we can create method also 
+   2 A record can be inherit from other records not from other class 
+     recod B(int a);
+	 record A(int a,int c):B(a);
+   3 A class cant inherit from another record
+      class manage{}:A  //not works 
+	4 we can implement one or more interface in record but only readonly or init
+	  public interfare Iperson
+	   {
+	     string Name{get;init;}
+	   }
+      public record Person(string name):Iperson
+	  {
+	  }
+	5. A record can be abstract and sealed type 
+	
+
+RECORD -Sealed ToString()
+The user defined override tostring() can be sealed in order to prevent further overriding
+
+public record Person(string name)
+{
+  public sealed override string ToString()
+  {
+    return $"peron name {name}"
+   }
+}
+
+public record Employed(string name):person(name)
+{
+  public override string ToString()
+  {
+    return $"Employee name {name} {base.ToString()}"; 
+  }
+}
+
+// Above code gives other because tostring is sealed in parent record 
+// base.ToString()  calls parent to string if it is not sealed 
+
+
+Record Structs 
+record struct record_name(Propertites_list) 
+******************************************************
+Command Line Arguments 
+
+CLI
+app.exe value1 value2  string[] args 
+
+--- top level statement how we can use 
+ arg[] is directly access
+ 
+*********************************************
+Partial Methods --
+ -- before c# we have issue only void not out param and not have internal or public 
+  from C# 9
+   public partial method  they all are resolved 
+   
+   namespace Basic.Application.PartialMethod;
+public partial class Student
+{
+    public int Id { get; set; }
+    public string Name { get; set; }
+
+    internal partial string OnNameChanging(string newName); // private by default
+                                                 // so no access modifier needed
+                                                 //not return type needed void only
+    partial void OnNameChanged();
+
+    public void UpdateName(string newName)
+    {
+        OnNameChanging(newName);
+        Name = newName;
+        OnNameChanged();
+    }
+}
+
+
+namespace Basic.Application.PartialMethod;
+public partial class Student
+{
+    internal partial string OnNameChanging(string newName)
+    {
+        Console.WriteLine($"Name is changing to {newName}");
+        return newName;
+    }
+
+    partial void OnNameChanged()
+    {
+        Console.WriteLine($"Name has been changed to {Name}");
+    }
+}
+
+
+**********************************************************
+Static Anonymous Functions 
+  A static anonymous function is an anonymous method or lambda expression,prefixed 
+  with static keyword
+  
+  Static delegate(param_list){  //Static Anonymous Functions (anonymous method)
+    cant acces local, param, instance member
+	can acces static members and constants 
+  }
+  
+  static(param_list)=>{ //Static Anonymous Functions (lambda expression)
+       cant acces local, param, instance member
+	can acces static members and constants 
+  }
+  
+  int miniPass=90 
+  static int miniPass1=90 
+  
+  arr.Where(static (x)=>    // miniPass is not access able
+  {
+    if(x> miniPass)         // miniPass1 is acess able 
+	  return true;          // const is accessable 
+	eslse 
+	 false;
+  })
+  
+  
+***************************************
+Lambda return type expression
+
+Func<int,object> getSquare = object(num) =>
+{
+    if(num < 0)
+        throw new ArgumentException("Number must be non-negative");
+    if(num == 0)
+        return "Zero has no square";
+    return num * num;
+};
+
+
+**********************************
+Constant Interpolated String  $"{var_name}"  c#10
+
+**********************************
+Interface Default Methods C# 8
+Default method are methods in interface with concrete implementation
+
+  public interface IEmp
+  {
+     public string Name{get;set;}
+	 
+	 //default interface methods [or] virtual extenstion must
+	 public string GetnameinUpperCase()  //intenal so the child in same if this 
+	                                     // Iemp.Internal_method() in child 
+	 {                                   // or internal in interface but public in child  but in future it will change
+	   return Name.toUpper()             // --------------------------
+	                                      // private  default method must have body 
+	 }
+  }
+  Notes 
+  // IEmp iemp=(IEmp)emp;
+   // it is accessable
+   // Now interface body have both concrete and abstact method  
+   // access modifier use 
+   
+
+// Interface Static Methods 
+  public interface IEmp
+  {
+     public string Name{get;set;}
+	 
+	 //default interface methods [or] virtual extenstion must
+	 public string GetnameinUpperCase()                                         
+	 {                                   
+	   return Name.toUpper()             // --------------------------
+	                                      
+	 }
+	 
+	 internal static string GetnameinLowerCase()    // we can call in same or any where                                       
+	 {                                   
+	   return Name.toLower()             // --------------------------
+	                                      
+	 }
+  }
+  
+  Notes :- in same with interface.static_method is need but outside do
+  
+  *******************************************
+  IndexfromEnd opreator -C#9 LIFO 
+     ^(charAt) this return the index from end of array (start form 1)
+     a[^1]=last_element of array 
+  
+ Example :- 
+int[] nums = { 1, 2, 3, 4, 5 };
+Index index = ^2;
+Console.WriteLine($"{nums[index]}"); // using index operator
+Console.WriteLine($"{nums[^1]}");// using index from end operator
+								// Equal to nums[nums.Length -1]
+								
+********************************************
+'Range' Struct   -- C#9
+      The range struct represents "start index" and "end index" together
+
+	 Range range = 1..4; // from index 1 to index 3 
+	                     // skip(1).take(3) // linq tranditaion
+     int[] subArray = nums[range]; // using range operator  
+	
+	
+// Range opreator in list
+List<string> fruits = new() { "Apple", "Banana", "Cherry", "Date", "Elderberry" };
+Range fruitRange = 1..4; // from index 1 to index 3
+List<string> subList = fruits[fruitRange]; // using range operator
+Console.WriteLine("SubList: " + string.Join(", ", subList));
+
+
