@@ -1,0 +1,16 @@
+****************************************************************
+****************************************************************
+.Net Design Patterns
+****************************************************************
+****************************************************************
+The Patterns 
+
+Creational              Structural            Behavioral 
+
+Builder                  Adapter               chain of Resposibilty
+Factories                Bridge                Command 
+   Abstract Factory      Composite             
+   Factory Method        Decorater
+Prototype                Facade
+Singleton                Flyweight
+                         Proxy

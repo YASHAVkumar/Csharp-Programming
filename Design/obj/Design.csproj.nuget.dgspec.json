@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "d:\\Development Enviroment\\Csharp_Fundaments\\Second\\Design\\Design.csproj": {}
+    "D:\\Development Enviroment\\Csharp_Fundaments\\Second\\Design\\Design.csproj": {}
   },
   "projects": {
-    "d:\\Development Enviroment\\Csharp_Fundaments\\Second\\Design\\Design.csproj": {
+    "D:\\Development Enviroment\\Csharp_Fundaments\\Second\\Design\\Design.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "d:\\Development Enviroment\\Csharp_Fundaments\\Second\\Design\\Design.csproj",
+        "projectUniqueName": "D:\\Development Enviroment\\Csharp_Fundaments\\Second\\Design\\Design.csproj",
         "projectName": "Design",
-        "projectPath": "d:\\Development Enviroment\\Csharp_Fundaments\\Second\\Design\\Design.csproj",
+        "projectPath": "D:\\Development Enviroment\\Csharp_Fundaments\\Second\\Design\\Design.csproj",
         "packagesPath": "C:\\Users\\Dell\\.nuget\\packages\\",
-        "outputPath": "d:\\Development Enviroment\\Csharp_Fundaments\\Second\\Design\\obj\\",
+        "outputPath": "D:\\Development Enviroment\\Csharp_Fundaments\\Second\\Design\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\Dell\\AppData\\Roaming\\NuGet\\NuGet.Config"

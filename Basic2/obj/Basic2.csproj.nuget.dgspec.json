@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "D:\\Development Enviroment\\Csharp_Fundaments\\Second\\Basic\\Basic.csproj": {}
+    "D:\\Development Enviroment\\Csharp_Fundaments\\Second\\Basic2\\Basic2.csproj": {}
   },
   "projects": {
-    "D:\\Development Enviroment\\Csharp_Fundaments\\Second\\Basic\\Basic.csproj": {
+    "D:\\Development Enviroment\\Csharp_Fundaments\\Second\\Basic2\\Basic2.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\Development Enviroment\\Csharp_Fundaments\\Second\\Basic\\Basic.csproj",
-        "projectName": "Basic",
-        "projectPath": "D:\\Development Enviroment\\Csharp_Fundaments\\Second\\Basic\\Basic.csproj",
+        "projectUniqueName": "D:\\Development Enviroment\\Csharp_Fundaments\\Second\\Basic2\\Basic2.csproj",
+        "projectName": "Basic2",
+        "projectPath": "D:\\Development Enviroment\\Csharp_Fundaments\\Second\\Basic2\\Basic2.csproj",
         "packagesPath": "C:\\Users\\Dell\\.nuget\\packages\\",
-        "outputPath": "D:\\Development Enviroment\\Csharp_Fundaments\\Second\\Basic\\obj\\",
+        "outputPath": "D:\\Development Enviroment\\Csharp_Fundaments\\Second\\Basic2\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\Dell\\AppData\\Roaming\\NuGet\\NuGet.Config"
