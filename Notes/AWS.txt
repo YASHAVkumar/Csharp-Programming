@@ -706,9 +706,8 @@ AWS iam list-users
 CLI ----
 
 C:\Users\Dell>aws configure
-AWS Access Key ID [None]: AKIA4CGOUWYPNJZAR5ZI
-AWS Secret Access Key [None]: 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
-Default region name [None]: ap-south-1
+
+
 Default output format [None]:
 
 C:\Users\Dell>aws iam list-users
