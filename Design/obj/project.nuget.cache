@@ -1,8 +1,14 @@
 {
   "version": 2,
+<<<<<<< HEAD
   "dgSpecHash": "YotKhl7dYko=",
   "success": true,
   "projectFilePath": "D:\\Development Enviroment\\Csharp_Fundaments\\Second\\Design\\Design.csproj",
+=======
+  "dgSpecHash": "AzQ8EjX/OQg=",
+  "success": true,
+  "projectFilePath": "D:\\Local Data\\Private\\Csharp-Programming\\Design\\Design.csproj",
+>>>>>>> bdecb1b87cc13fa3b83fc6ab76abc7d622b06503
   "expectedPackageFiles": [],
   "logs": []
 }

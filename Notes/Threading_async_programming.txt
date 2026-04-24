@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 ****************************************
 Threading 
 ****************************************
@@ -735,4 +736,743 @@ static void InvokeDataProcessingWithMutex(List<string> chunk, string chunkName)
 
 	  
 ***************************************
+=======
+****************************************
+Threading 
+****************************************
+Intro --- 
+1. Sequential -- old programing and it is slow 
+2. Concurrent -- 
+   Single-core core--[Task 1] [Task 2] [Task 1]-->
+   Multi core   core1 -- [Task 1] -Context Switching- [Task 1]
+                core2 --       [Task 2] [Task 2]
+
+3. Parallel 
+    Multi core -- Core 1 -->[Task 1] -- completly no switching
+	              Core 2 -->[Tak 2] -- completly no switching
+
+4. Concurrent & Parallel 
+    Multi core -- Core 1 -->[Task 1] -Task2 -> pause play and context switching
+	              Core 2 -->[Tak 2] - Task1-> pause play and context switching
+
+[ Thread is light weight unit of execution within a process ]
+[ Multithreading can help to increase the overall performance of a program by allowing to 
+	to take full uitilization of multiple cores of the processor.]
+
+*****************
+System.Threading.Thread
+'Thread' Class
+
+Thread object 1 --[ priority],[ThreadState],[call stack],[_threadStart],[Run][Join][Sleep]
+Prop - string Name, ThreadPriority Priority,bool isActive, bool isBackground, ThreadState ThreadState, int ManagedThreadId, CurrentThread
+Methods - Start(),Join(),Sleep(milisec),Interrupt()
+
+Thread mainThread = Thread.CurrentThread;
+mainThread.Name = "Main Thread";
+
+// write all properties of the main thread
+Console.WriteLine($"Main Thread ID: {mainThread.ManagedThreadId}");
+Console.WriteLine($"Main Thread IsBackground: {mainThread.IsBackground}");
+Console.WriteLine($"Main Thread Priority: {mainThread.Priority}");
+Console.WriteLine($"Main Thread ThreadState: {mainThread.ThreadState}");
+
+CPU Inbound time consumpltion -- cpu proces 
+CPU Outbound time consumption -- external source reading /writing 
+
+
+--Thread Join
+incrementThread.Join();
+decrementThread.Join();
+Console.WriteLine("Both threads have completed their work.");
+   
+
+--Interrupt -- 
+ This interrupt by throw "ThreadInterruptedException"
+
+Thread.Sleep(2000); // Main thread sleeps for 5 seconds
+if (incrementThread.IsAlive)
+{
+    Console.WriteLine("Interrupting Increment Thread...");
+    incrementThread.Interrupt();
+}
+
+
+ThreadState ThreadState
+   1. Unstarted : thread created  new Thread();
+   2. Running : Indicated thread is running 
+   3. WaitSleepJoin: Indicates thread is in wait sleep join -- not execution
+   4. Suspended: removed
+   5. Aborted: removed 
+   6. Stoppped : end of thread 
+
+-------------------------
+Thread Invoker --Thread Parameter--> Thread
+
+Thread decrementThread = new(()=>counter.Decrement(100))  //Invoke Thread method manually
+{
+    Name = "Decrement Thread",
+    Priority=ThreadPriority.BelowNormal
+};
+decrementThread.Start();
+
+--------------------------
+ParameterizedThreadStart
+
+ParameterizedThreadStart parameterizedThreadStart = new(counter.Increment);
+
+Thread incrementThread = new(parameterizedThreadStart)
+{
+    Name = "Increment Thread",
+    Priority=ThreadPriority.AboveNormal
+};
+
+incrementThread.Start(1000); // Pass initial count as parameter
+Console.WriteLine($"Main Thread ID: {incrementThread.Name} is doing other work...");
+
+
+Note :- Thread refrence method have access of class property 
+        But two thread using same/shared resource then may be or not thread syncronize issue
+---------------------
+Callback 	--- when work is completed then notify after thread excution
+   Thread Invoker ----Start (callback) --> ThreadMethod(callback){ work } --
+
+Code snnipet :- 
+
+DesiredSum desiredSum = new();
+long gSum = 0;
+int count = 100;
+Action<long> callback = sum => {Console.WriteLine($"Sum calculated Now invoking print thread"); gSum = sum; };
+ThreadStart calculateSumThreadStart = new(() => desiredSum.CalculateSumOfN(callback, count));
+Thread calculateSumThread = new(calculateSumThreadStart)
+{
+    Name = "Calculate Sum Thread",
+    Priority = ThreadPriority.AboveNormal
+};
+
+calculateSumThread.Start();
+
+ThreadStart printSumThreadStart = new(()=>desiredSum.PrintSum(gSum, count));
+Thread printSumThread = new(printSumThreadStart)
+{
+    Name = "Print Sum Thread",
+    Priority = ThreadPriority.BelowNormal
+};
+calculateSumThread.Join(); // Wait for the sum calculation thread to finish
+Console.WriteLine($"Main Thread ID: {calculateSumThread.Name} has finished calculating sum. Now starting print thread...");
+printSumThread.Start(); // Start the print thread after calculation is done
+printSumThread.Join(); // Wait for the print thread to finish
+Console.WriteLine($"Main Thread ID: {calculateSumThread.Name} is doing other work...{calculateSumThread.ThreadState}");
+
+
+------------------------------------------------------
+Shared Resource --- 
+
+Race Condition -- A rare condition occurs when multiple thread try to update shared data the output depends on excution, result is unpredictable
+Data Inconsistancy - when multiple threads read and modify shared data without sync it can lead to data inconsistency.
+Deadlock -- A deadlock occurs when two or more thread are blocked indefinitely because each thread is waiting
+            for a resource that is held by another thread. Thi situation result in stanstill, becomes unresponsive.
+Starvation -- When one higher priority thread and another with lower priority then shared resource  will wait in second thread. 
+
+-----------------------------------
+Thread Synchronization 
+	Thread Synchronization Mechanisms
+       Monitor -- Eg go to bank ask employess for permission (Lock used FIFO)
+	        Monitor.Enter(_lock); // wait for the lock to be available
+            _counter++;
+            Console.WriteLine($"Counter: {_counter} in Thread: {Thread.CurrentThread.Name}");
+            Monitor.Exit(_lock); // release the lock
+       
+       Lock --- A shortcut syntax to use Monitor.Enter and Exit
+	      //Monitor.Enter(_lock); // wait for the lock to be available
+            lock (_lock){
+            _counter++;
+            Console.WriteLine($"Counter: {_counter} in Thread: {Thread.CurrentThread.Name}");
+            }
+			//Monitor.Exit(_lock); // release the lock
+	      	      
+       Mutex
+       Semaphores	
+
+
+Thread Signaling -- It is a technique to make a thread wait for signal from another thread
+					(singal thread) when condition meets 
+        	Implemented using Events(ManualResetEvent, AutoResetEvent) and Monitor.
+
+Diagram:-
+
+Thread 1  --- wait --------------running----------------wait -->
+
+Event object [Unsignaled]  ^     [Signaled]    ^      [Unsignaled]
+
+Thread 2  --- Running -- Signal---running--UnSignal--running --> 	
+
+ManualResetEvent -- Gate so all consumer will work
+   Is is a sync primitve that is used to enable singaling mechanism between threads.
+   by set() and reset()
+   
+   Eg:-  Producer and consumer story	
+   1,2,3 4,5,6 7,8,9 10,11,12 13,14,15
+
+
+    public void Produce()
+    {
+        Console.WriteLine("Producer is starting to produce items...");
+        for (int batch = 0; batch < SharedResource.BatchCount; batch++)
+        {
+            //Console.WriteLine($"Producer is producing batch {batch + 1}...");
+            for (int i = 0; i < SharedResource.BatchSize; i++)
+            {
+                int index = batch * SharedResource.BatchSize + i;
+                if (index < SharedResource.Data.Length)
+                {
+                    SharedResource.Data[index] = index + 1; // Simulate producing data by filling the array with values
+                    //Console.WriteLine($"Producer produced: {SharedResource.Data[index]}");
+                    Thread.Sleep(300); // Simulate time taken to produce an item
+                }
+            }
+            SharedResource.ProducerFinished.Set(); // Signal that the producer has finished producing the current batch
+           // Console.WriteLine($"Producer has finished producing batch {batch + 1}.");
+            SharedResource.ProducerFinished.Reset(); // Reset the event for the next batch
+        }
+        Console.WriteLine("Producer has finished producing items.");
+    }
+
+    public void Consume()
+    {
+        Console.WriteLine("Consumer is starting to consume items...Consumer will wait until the producer has finished producing each batch.");
+        for (int batch = 0; batch < SharedResource.BatchCount; batch++)
+        {
+            SharedResource.ProducerFinished.WaitOne(); // Wait for the producer to signal that it has finished producing the current batch
+            Console.WriteLine($"Producer has finished batch {batch + 1}. Consumer is now consuming items from this batch...");
+            
+            for (int i = 0; i < SharedResource.BatchSize; i++)
+            {
+                int index = batch * SharedResource.BatchSize + i;
+                if (index < SharedResource.Data.Length)
+                {
+                    int item = SharedResource.Data[index]; // Simulate consuming data by reading values from the array
+                    Console.WriteLine($"Consumer consumed: {item}");
+                    Thread.Sleep(150); // Simulate time taken to consume an item
+                }
+            }
+            Console.WriteLine($"Consumer has finished consuming items from batch {batch + 1}.");
+        }
+        Console.WriteLine("Consumer has finished consuming all items.");  
+    }
+
+AutoResetEvent --- Metro gate imedetatly auto reset 
+
+ public void ProduceWithAutoReset()
+    {
+        Console.WriteLine("Producer is starting to produce items...");
+        for (int batch = 0; batch < SharedResource.BatchCount; batch++)
+        {
+            //Console.WriteLine($"Producer is producing batch {batch + 1}...");
+            for (int i = 0; i < SharedResource.BatchSize; i++)
+            {
+                int index = batch * SharedResource.BatchSize + i;
+                if (index < SharedResource.Data.Length)
+                {
+                    SharedResource.Data[index] = index + 1; // Simulate producing data by filling the array with values
+                    //Console.WriteLine($"Producer produced: {SharedResource.Data[index]}");
+                    Thread.Sleep(300); // Simulate time taken to produce an item
+                }
+            }
+            SharedResource.ProducerFinishedAuto.Set(); // Signal that the producer has finished producing the current batch
+           // Console.WriteLine($"Producer has finished producing batch {batch + 1}.");
+            //SharedResource.ProducerFinished.Reset(); // Reset the event for the next batch
+        }
+        Console.WriteLine("Producer has finished producing items.");
+    }
+
+   public void ConsumeWithAutoReset()
+
+    {
+        Console.WriteLine("Consumer is starting to consume items...Consumer will wait until the producer has finished producing each batch.");
+        for (int batch = 0; batch < SharedResource.BatchCount; batch++)
+        {
+            SharedResource.ProducerFinishedAuto.WaitOne(); // Wait for the producer to signal that it has finished producing the current batch
+            //Console.WriteLine($"Producer has finished batch {batch + 1}. Consumer is now consuming items from this batch...");
+            
+            for (int i = 0; i < SharedResource.BatchSize; i++)
+            {
+                int index = batch * SharedResource.BatchSize + i;
+                if (index < SharedResource.Data.Length)
+                {
+                    int item = SharedResource.Data[index]; // Simulate consuming data by reading values from the array
+                    Console.WriteLine($"Consumer consumed: {item}");
+                    Thread.Sleep(150); // Simulate time taken to consume an item
+                }
+            }
+            Console.WriteLine($"Consumer has finished consuming items from batch {batch + 1}.");
+        }
+        Console.WriteLine("Consumer has finished consuming all items.");  
+    }
+
+--------------------------------------
+Monitor.Wait() and Monitor.Pulse() and Monitor.PulseAll() [To wake up other threads] --Sinaling mechanism among threads.
+
+public class Producer
+{
+    public void Produce()
+    {
+        Console.WriteLine("Producer is starting to produce items...");
+        for(int i = 1; i <= 10; i++)
+        {
+            lock(Shared.LockObject)
+            {
+                if(Shared.Buffer.Count == Shared.BufferSize)
+                {
+                    Console.WriteLine("Buffer is full. Producer is waiting for items to be consumed...");
+                    Monitor.Wait(Shared.LockObject); // Wait until the consumer consumes an item
+                }
+            }
+            
+            Console.WriteLine("Producer is trying to produce an item...");
+            Thread.Sleep(7000); // Simulate time taken to produce an item
+
+            lock(Shared.LockObject)
+            {
+                if(Shared.Buffer.Count < Shared.BufferSize)
+                {
+                    Shared.Buffer.Enqueue(i);
+                    Console.WriteLine($"Producer produced: {i}");
+                    Shared.PrintBuffer();
+
+                    Monitor.Pulse(Shared.LockObject); // Notify the consumer that an item has been produced
+                }
+            }
+        }
+       
+
+        Console.WriteLine("Producer has finished producing items.");
+    }
+}
+
+public class Consumer
+{
+    public void Consume()
+    {
+        
+            Console.WriteLine("Consumer is starting to consume items...");
+        for(int i = 0; i < 10; i++)
+        {
+            lock(Shared.LockObject)
+            {
+                if(Shared.Buffer.Count == 0)
+                {
+                    Console.WriteLine("Buffer is empty. Consumer is waiting for items to be produced...");
+                    Monitor.Wait(Shared.LockObject); // Wait until the producer produces an item
+                }
+            }
+            
+            Console.WriteLine("Consumer is trying to consume an item...");
+            Thread.Sleep(1500); // Simulate time taken to consume an item
+
+            lock(Shared.LockObject)
+            {
+                if(Shared.Buffer.Count > 0)
+                {
+                    int val = Shared.Buffer.Dequeue();
+                    Console.WriteLine($"Consumer consumed: {val}");
+
+                    Monitor.Pulse(Shared.LockObject); // Notify the producer that an item has been consumed
+                }
+            }
+        }
+            Console.WriteLine("Consumer has finished consuming all items.");
+        
+    }
+} 
+
+Same above logic with Manual Reset Event 
+
+class Shared
+{
+    public static object LockObject = new object();
+    public static ManualResetEvent ProducerEvent=new(true);
+    public static ManualResetEvent ConsumerEvent=new(false);
+    public static Queue<int> Buffer = new Queue<int>();
+    public static int BufferSize = 5;
+    public static bool IsProducing = true; // Flag to indicate if the producer is still producing items
+    public static void PrintBuffer()
+    {
+        Console.WriteLine("Current Buffer: ");
+        foreach (var item in Buffer)
+        {
+            Console.Write(item + " ");
+        }
+        Console.WriteLine(); // New line after printing all buffer items
+    }
+}
+
+public void ProduceWithManualResetEvent()
+{
+    Console.WriteLine("Producer is starting to produce items...");
+
+    for (int i = 1; i <= 15; i++)
+    {
+        // ✅ WAIT until buffer has space
+        Shared.ProducerEvent.WaitOne();
+
+        Console.WriteLine("Producer is trying to produce an item...");
+        Thread.Sleep(1500); // Simulate production time
+
+        lock (Shared.LockObject)
+        {
+            Shared.Buffer.Enqueue(i);
+            Console.WriteLine($"Producer produced: {i}");
+            Shared.PrintBuffer();
+
+            // ✅ Buffer now has data → allow consumer
+            Shared.ConsumerEvent.Set();
+
+            // ✅ Buffer full → stop producer
+            if (Shared.Buffer.Count == Shared.BufferSize)
+            {
+                Console.WriteLine("Buffer is full. Producer is waiting...");
+                Shared.ProducerEvent.Reset();
+            }
+        }
+    }
+
+    Console.WriteLine("Producer has finished producing items.");
+}
+
+public void ConsumeWithManualResetEvent()
+{
+    Console.WriteLine("Consumer is starting to consume items...");
+
+    for (int i = 0; i < 15; i++)
+    {
+        // ✅ WAIT until buffer has data
+        Shared.ConsumerEvent.WaitOne();
+
+        Console.WriteLine("Consumer is trying to consume an item...");
+        Thread.Sleep(1000); // Simulate consumption time
+
+        lock (Shared.LockObject)
+        {
+            int val = Shared.Buffer.Dequeue();
+            Console.WriteLine($"Consumer consumed: {val}");
+
+            // ✅ Buffer now has space → allow producer
+            Shared.ProducerEvent.Set();
+
+            // ✅ Buffer empty → stop consumer
+            if (Shared.Buffer.Count == 0)
+            {
+                Console.WriteLine("Buffer is empty. Consumer is waiting...");
+                Shared.ConsumerEvent.Reset();
+            }
+        }
+    }
+
+    Console.WriteLine("Consumer has finished consuming all items.");
+}
+
+
+-------------------------------
+System.Collection.Concurrent
+
+Concurrent collections  -- specialized data structures designed for multi- threaded 
+                           access that ensure thread safe concurrent access.
+Avoid the need of explicit locks and thread sync (built-in)
+Since there is no not explicit thread sync, the multi-threading code becomes simpler
+
+1. ConcurrentStack<T> 
+   Thread safe LIFO stack, alternate of generic.Stack<T>
+   --->method Push, TryPop(out t),TryPeek(out item)
+2. ConcurrentQueue<T> 
+   Thread Safe FIFO queue, alternative of Genric.Queue<T>
+    ---> method  Enqueue, TryDeque(out t), TryPeek(out t)
+3. ConcurrentBag<T> 
+   Thread safe unordred collections, alternate of generic.Hashset<T>
+   ----> method Add, TryTake(out t), TryPeek(out t)
+4. ConcurrentDictionary<Tkey,Tvalue> 
+   Thread safe key-value store, alternative of collections.Genric.Dictionary<Tkey,Tvalue>
+   ---> method TryAdd(key,val), TryGetValue(key, out value),TryRemove(key,out val), TryUpdate(key, newvalue, oldcomparivalue)
+   
+--------------------------------------------------------------------------
+CSV READING IN Chunk
+Main thread (read 100 csv rows)-->start new thread (1,2,3)-->child thread(Proces the chunk of data)
+-->Print (gender wise data)
+
+--------------------------------------------
+Semaphores -> limit no of concurrent threads
+   Semaphores is synchronization primitve to control the number of concurrent threads 
+   that can access one or more shared resources.
+   
+Three threads created                                   Semaphores created.2 slots available
+ Initial Count: 2, Max Count:2,Current Count:0          Initial Count: 2, Max Count:2,Current Count:0 
+ 
+ Thread1 requested & acquired a semaphore slot.          1 semaphore slot(s) available
+														Initial Count: 2, Max Count:2,Current Count:1
+														
+ Thread2 requested & acquired a semaphore slot.       0 semaphore slot(s) available
+														Initial Count: 2, Max Count:2,Current Count:2
+														
+ Thread3 requested & acquired a semaphore slot.       0 semaphore slot(s) available
+  but blocked (waitsleepjoin state)					  Initial Count: 2, Max Count:2,Current Count:2
+
+ Thread1 released a semaphore slot.      			  1 semaphore slot(s) available
+													  Initial Count: 2, Max Count:2,Current Count:1	
+
+ Thread3 acquired the semaphore slot.      			  0 semaphore slot(s) available
+	since it comes first or waiting	 				 Initial Count: 2, Max Count:2,Current Count:2	
+	
+-------------------------------
+Mutex -- class is Synchronization primitve that enable thread synchronization alternate for monitors
+ (A mutex is like a bathroom key Whoever has the key can enter Others must wait until it’s released)
+ 
+ NOTE- 
+Diffrence between Monitor vs Mutex 
+  1. LOCK object -- in case mutex no explicit lock object need to create like monitors
+  2. Inter-process Communication -- Monitor can only be accessed within the single process
+                                    Mutex can be accessed across multiple process (IPC) using named pipes or sockets 
+
+
+--------------------------------
+Thread Pool 
+    The thread Pool is a collection of worker threads that are pre-allocated and managed b the .net runtime (First-COME First serve) 									
+     A thread pool is a managed set of reusable threads that execute short-lived tasks.
+	Instead of creating/destroying threads every time (slow + memory-heavy), the runtime keeps a pool of ready threads and reuses them. 
+
+
+	[TASK Queue [t3][t2][t1]] [ THREAD POOL [t1][t2][t3]....]
+
+-------------------------------	
+CountDownEvent  -- is a thread-safe signaling primitive in .NET that lets one or more threads wait until a fixed number of operations finish.
+                ('Wake me up when N things are done.')                                         
+
+
+
+Code snnipet for CSV 
+
+namespace Basic.Application.Threading;
+public class SharedData
+{
+    public static object lockObject = new();
+    public static string FilePath = "data.csv";
+    public static int chunkSize = 100; // Number of lines to read/write at a time
+    public static int MaxConcurrentThread = 3; // Maximum number of concurrent threads
+    public static Mutex mutex = new(); // Mutex to control access to shared resources no longer need of lockObject
+
+    public static CountdownEvent countdownEvent; // CountdownEvent to wait for all threads to complete
+}
+
+
+public class CSVWithThreading
+{
+  public string ChunkName { get; set; }
+  public List<string> Data { get; set; }
+  public Dictionary<string, int> GenderCount =[];
+   public void DataProcessing()
+    {
+        foreach (var line in Data)
+        {
+            if(string.IsNullOrWhiteSpace(line) || line.StartsWith("Id")) continue; // Skip empty lines and header
+            var columns = line.Split(',');
+            if(columns.Length>=5)
+            {  
+                string gender = columns[4].Trim().ToLower();
+                if(GenderCount.ContainsKey(gender))
+                {
+                    GenderCount[gender]++;
+                }
+                else
+                {
+                    GenderCount[gender] = 1;
+                }
+            }
+
+          Random rnd = new();
+          Thread.Sleep(100*rnd.Next(2, 5)); // Simulate processing time
+
+        }
+
+    }
+}
+
+
+Main(){
+  // CSV with threading
+#region CSV with threading
+string csv =
+    "id,first_name,last_name,email,gender\n" +
+    string.Join("\n",
+        Enumerable.Range(1, 1001).Select(i =>
+            $"{i},First{i},Last{i},user{i}@example.com,{(i % 2 == 0 ? "Female" : "Male")}"
+        )
+    );
+
+
+ File.WriteAllText(SharedData.FilePath, csv); // Initialize CSV file with headers
+#endregion
+
+//Read data from CSV file
+using(StreamReader reader = new(SharedData.FilePath))
+{
+    string headerLine = reader.ReadLine()??""; // Read header line
+    string? line;
+    int lineNumber = 0;
+
+    //Create a chunk
+    List<string> chunk = new();
+    
+    //create collection of threads to process chunks
+    List<Thread> processingThreads = new();
+    int ThreadCount = 0;
+
+    // Create semaphore to limit the number of concurrent threads
+    SemaphoreSlim semaphore = new(SharedData.MaxConcurrentThread, SharedData.MaxConcurrentThread);
+
+    while ((line = reader.ReadLine()) != null)
+    {
+        if(string.IsNullOrWhiteSpace(line))
+            continue;
+
+        // Process each line of CSV data
+        //Console.WriteLine(line);
+        chunk.Add(line);
+        lineNumber++;
+
+        // If chunk size is reached, process the chunk in a separate thread
+        if(lineNumber % SharedData.chunkSize == 0)
+        {
+            List<string> chunkToProcess = new(chunk); // Create a copy of the chunk for processing
+            string chunkName = $"Chunk {ThreadCount + 1}"; // Name for the chunk being processed
+            ThreadPool.QueueUserWorkItem((object? state) =>
+            //Thread processingThread = new(() =>
+            {
+                // Wait for the semaphore to allow processing
+                semaphore.Wait();
+                try
+                {
+                    InvokeDataProcessingWithMutex(chunkToProcess, state?.ToString()??"Unknown Chunk");
+                }
+                catch(Exception ex)
+                {
+                    Console.WriteLine($"Error processing {chunkName}: {ex.Message}");
+                }
+                finally
+                {
+                    semaphore.Release(); // Release the semaphore when processing is complete
+                }
+            
+            },chunkName);
+
+            ThreadCount++;
+
+            // processingThread.Name = $"Processing Thread {ThreadCount}";
+            // processingThreads.Add(processingThread);
+            // processingThread.Start();
+            
+            chunk.Clear(); // Clear the chunk for the next set of lines
+         }
+    }
+
+    //process any remaining lines in the last chunk
+    if(chunk.Count > 0)
+    {  
+        ThreadCount++;
+        string chunkName = $"Chunk {ThreadCount}"; // Name for the last chunk being processed
+        Thread processingThread = new(() =>
+        { // Wait for the semaphore to allow processing
+                semaphore.Wait();
+                try
+                {
+                InvokeDataProcessing(chunk, chunkName);
+                }
+                catch(Exception ex)
+                {
+                    Console.WriteLine($"Error processing {chunkName}: {ex.Message}");
+                }
+                finally
+                {
+                    semaphore.Release(); // Release the semaphore when processing is complete
+                }
+        });
+        processingThread.Name = $"Processing Thread {ThreadCount + 1}";
+        processingThreads.Add(processingThread);
+        processingThread.Start();
+    }
+
+    SharedData.countdownEvent = new CountdownEvent(ThreadCount - 1); // Initialize CountdownEvent with the number of processing threads //10
+                                                                     //initialize CountdownEvent with the number of processing threads                                                                   //current count of processing threads is ThreadCount-1 because the last chunk is being processed in the main thread and not added to the processingThreads list
+    SharedData.countdownEvent.Wait(); // Wait for all processing threads to complete
+
+    foreach (var thread in processingThreads)
+    {
+        thread.Join();
+    }
+}
+
+Console.WriteLine("All chunks have been processed. from csv file");
+Console.WriteLine("Press Enter to exit...");
+Console.ReadLine();
+
+static void InvokeDataProcessing(List<string> chunk, string chunkName)
+{
+   
+    Console.WriteLine($"{chunkName} is being processing by {Thread.CurrentThread.Name}...");
+   CSVWithThreading csvProcessor = new() { ChunkName = chunkName, Data = chunk };
+   csvProcessor.DataProcessing();
+   
+   // Display
+   lock(SharedData.lockObject){
+    Console.WriteLine("-----------------------------------");
+    Console.WriteLine($"{chunkName} processed of size {chunk.Count} by {Thread.CurrentThread.Name}");
+    
+    foreach(var kvp in csvProcessor.GenderCount)
+    {
+        Console.WriteLine($"{chunkName} - {kvp.Key}: {kvp.Value}");
+    }
+
+   }  
+}
+
+static void InvokeDataProcessingWithMutex(List<string> chunk, string chunkName)
+{
+   
+    Console.WriteLine($"{chunkName} is being processing by {Thread.CurrentThread.Name}...");
+   CSVWithThreading csvProcessor = new() { ChunkName = chunkName, Data = chunk };
+   csvProcessor.DataProcessing();
+
+    // Display
+    try{
+    SharedData.mutex.WaitOne(); // Acquire the mutex before accessing shared resources 
+    {
+        Console.WriteLine("-----------------------------------");
+        Console.WriteLine($"{chunkName} processed of size {chunk.Count} by {Thread.CurrentThread.Name}");
+
+        foreach (var kvp in csvProcessor.GenderCount)
+        {
+            Console.WriteLine($"{chunkName} - {kvp.Key}: {kvp.Value}");
+        }
+
+    }
+    }
+    catch(Exception ex)
+    {
+        Console.WriteLine($"Error in {chunkName} while acquiring mutex: {ex.Message}");
+    }
+    finally
+    {
+       if(SharedData.countdownEvent.CurrentCount > 0)
+        SharedData.countdownEvent.Signal(); // Signal that this thread has completed processing
+       else 
+         SharedData.countdownEvent.Reset(); // Reset the CountdownEvent if the count has already reached zero to avoid exceptions in case of extra signals
+         
+           //decrement the count of the CountdownEvent to indicate that this thread has completed processing
+        SharedData.mutex.ReleaseMutex(); // Release the mutex after accessing shared resources
+    }
+}
+ 
+}
+
+
+	  
+***************************************
+>>>>>>> bdecb1b87cc13fa3b83fc6ab76abc7d622b06503
 ****************************************

@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 ****************************************************************
 ****************************************************************
 .Net Design Patterns
@@ -13,4 +14,21 @@ Factories                Bridge                Command
    Factory Method        Decorater
 Prototype                Facade
 Singleton                Flyweight
+=======
+****************************************************************
+****************************************************************
+.Net Design Patterns
+****************************************************************
+****************************************************************
+The Patterns 
+
+Creational              Structural            Behavioral 
+
+Builder                  Adapter               chain of Resposibilty
+Factories                Bridge                Command 
+   Abstract Factory      Composite             
+   Factory Method        Decorater
+Prototype                Facade
+Singleton                Flyweight
+>>>>>>> bdecb1b87cc13fa3b83fc6ab76abc7d622b06503
                          Proxy
